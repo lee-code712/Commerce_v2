@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.digital.v2.schema.ErrorMsg;
-import com.digital.v2.schema.Inventory;
 import com.digital.v2.schema.Product;
 import com.digital.v2.schema.ProductList;
 import com.digital.v2.service.InventoryService;
@@ -93,28 +92,6 @@ public class ProductController {
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
-	}
-	
-	@RequestMapping(value = "/inventory/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "상품 재고 수량 변경", notes = "특정 상품의 재고수량을 변경하기 위한 API.")
-	@ApiResponses({
-		@ApiResponse(code = 200, message = "성공", response = Inventory.class),
-		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
-	})
-	public ResponseEntity<?> inventoryUpdate (@Parameter(name = "상품 재고수량 변경", description = "", required = true) @RequestBody Inventory inventory) {
-		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
-		ErrorMsg errors = new ErrorMsg();
-		
-		Inventory resInventory = new Inventory();
-		try {
-			if (inventorySvc.inventoryUpdate(inventory.getProductId(), inventory.getQuantity())) {
-				resInventory = inventorySvc.inventorySearchByProductId(inventory.getProductId());
-			}
-		} catch (Exception e) {
-			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
-		}
-
-		return new ResponseEntity<Inventory>(resInventory, header, HttpStatus.valueOf(200));
 	}
 	
 }

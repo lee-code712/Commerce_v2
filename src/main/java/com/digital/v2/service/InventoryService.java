@@ -78,17 +78,10 @@ public class InventoryService {
 		return inventory;
 	}
 	
-	public boolean inventoryUpdate (long productId, long quantity) throws Exception {
+	public boolean inventoryUpdate (long productId, long newQuantity) throws Exception {
 		
 		try {
 			Inventory inventory = inventorySearchByProductId(productId);
-			
-			long newQuantity = inventory.getQuantity() + quantity;
-			if (newQuantity < 0) {
-				throw new Exception("재고 수량이 " +  (-newQuantity) + "개 부족합니다.");
-			} else if (newQuantity > 1000) {
-				throw new Exception("재고 수량은 1000개를 넘을 수 없습니다.");
-			}
 
 			Term updateTerm = new Term("inventoryid", "" + inventory.getInventoryId());		
 			Document newDoc = new Document();
@@ -103,5 +96,31 @@ public class InventoryService {
 			throw e;
 		}
 	}
+	
+//	public boolean inventoryUpdate (long productId, long quantity) throws Exception {
+//		
+//		try {
+//			Inventory inventory = inventorySearchByProductId(productId);
+//			
+//			long newQuantity = inventory.getQuantity() + quantity;
+//			if (newQuantity < 0) {
+//				throw new Exception("재고 수량이 " + (-newQuantity) + "개 부족합니다.");
+//			} else if (newQuantity > 1000) {
+//				throw new Exception("재고 수량은 1000개를 넘을 수 없습니다.");
+//			}
+//
+//			Term updateTerm = new Term("inventoryid", "" + inventory.getInventoryId());		
+//			Document newDoc = new Document();
+//			
+//			newDoc.add(new TextField("inventoryid", "" + inventory.getInventoryId(), Store.YES));
+//			newDoc.add(new TextField("inventoryproductid", "" + inventory.getProductId(), Store.YES));
+//			newDoc.add(new TextField("quantity", "" + newQuantity, Store.YES));
+//			
+//			update(newDoc, updateTerm);
+//			return true;
+//		} catch (Exception e) {
+//			throw e;
+//		}
+//	}
 	
 }
