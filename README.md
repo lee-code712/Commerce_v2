@@ -1,0 +1,2 @@
+- DB : Lucene / Framework: Springboot / 개발언어 : Java / API : Swagger
+- 서버 : Apache Tomcat
