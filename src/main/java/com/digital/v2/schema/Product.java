@@ -9,11 +9,11 @@ public class Product {
 	@ApiModelProperty(required = false, position = 1, notes = "상품 ID", example = "0", dataType = "long")
 	private long productId;
 	
-	@ApiModelProperty(required = true, position = 2, notes = "상품 카테고리", example = "", dataType = "object")
-	private Category category;
+	@ApiModelProperty(required = true, position = 2, notes = "상품 카테고리 ID", example = "0", dataType = "long")
+	private long categoryId;
 	
-	@ApiModelProperty(required = true, position = 3, notes = "상품 재고", example = "", dataType = "object")
-	private Inventory inventory;
+	@ApiModelProperty(required = false, position = 3, notes = "상품 재고 ID", example = "0", dataType = "long")
+	private long inventoryId;
 	
 	@ApiModelProperty(required = true, position = 4, notes = "상품 가격", example = "1000", dataType = "long")
 	private long price;
@@ -30,22 +30,20 @@ public class Product {
 		this.productId = productId;
 	}
 	
-	public Category getCategory() {
-		Category category = this.category;
-		return category;
+	public long getCategoryId() {
+		return categoryId;
 	}
 
-	public void setCategory(Category category) {
-		this.category = category;
+	public void setCategoryId(long categoryId) {
+		this.categoryId = categoryId;
+	}
+	
+	public long getInventoryId() {
+		return inventoryId;
 	}
 
-	public Inventory getInventory() {
-		Inventory inventory = this.inventory;
-		return inventory;
-	}
-
-	public void setInventory(Inventory inventory) {
-		this.inventory = inventory;
+	public void setInventoryId(long inventoryId) {
+		this.inventoryId = inventoryId;
 	}
 
 	public long getPrice() {

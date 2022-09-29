@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.digital.v2.schema.ErrorMsg;
 import com.digital.v2.schema.Product;
 import com.digital.v2.schema.ProductList;
-import com.digital.v2.service.InventoryService;
 import com.digital.v2.service.ProductService;
 import com.digital.v2.utils.ExceptionUtils;
 
@@ -33,8 +32,6 @@ public class ProductController {
 	
 	@Resource
 	ProductService productSvc;
-	@Resource
-	InventoryService inventorySvc;
 	
 	@RequestMapping(value = "/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "상품 등록", notes = "상품 등록을 위한 API.")

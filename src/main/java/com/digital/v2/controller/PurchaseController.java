@@ -17,6 +17,4 @@ public class PurchaseController {
 	@Resource
 	PurchaseService purchaseSvc;
 	
-	
-
 }

@@ -24,11 +24,16 @@ public class InventoryService {
 	public boolean inventoryWrite (Inventory inventory) throws Exception {
 		
 		try {
-			inventory.setInventoryId(System.currentTimeMillis());
+			// inventory 중복 여부 확인
+			if (inventorySearchById(inventory.getInventoryId()).getInventoryId() != 0) {
+				throw new Exception("상품에 대한 재고가 이미 등록되어 있습니다.");
+			}
+			
+			// 중복이 아니면 write
+			
 			Document doc = new Document();
 			
 			doc.add(new TextField("inventoryid", "" + inventory.getInventoryId(), Store.YES));
-			doc.add(new TextField("inventoryproductid", "" + inventory.getProductId(), Store.YES));
 			doc.add(new TextField("quantity", "" + inventory.getQuantity(), Store.YES));
 			
 			write(doc);
@@ -40,20 +45,19 @@ public class InventoryService {
 	
 	public Inventory inventorySearch (String productName) throws Exception {
 		
-		String key = "inventoryproductid";
+		String key = "inventoryid";
 		String value;
 		
 		Product product = productSvc.productSearch(productName);
 		
 		Inventory inventory = new Inventory();
 		if (product.getProductName() != null) {
-			value = "" + product.getProductId();
+			value = "" + product.getInventoryId();
 			
 			Document doc = findHardly(key, value);
 			
 			if (doc != null) {
 				inventory.setInventoryId(Long.parseLong(doc.get("inventoryid")));
-				inventory.setProductId(Long.parseLong(doc.get("inventoryproductid")));
 				inventory.setQuantity(Long.parseLong(doc.get("quantity")));
 			}
 		}
@@ -61,34 +65,30 @@ public class InventoryService {
 		return inventory;
 	}
 	
-	public Inventory inventorySearchByProductId (long productId) throws Exception {
+	public Inventory inventorySearchById (long inventoryId) throws Exception {
 		
-		String key = "inventoryproductid";
-		String value = "" + productId;
+		String key = "inventoryid";
+		String value = "" + inventoryId;
 		
 		Document doc = findHardly(key, value);
 		
 		Inventory inventory = new Inventory();
 		if (doc != null) {
 			inventory.setInventoryId(Long.parseLong(doc.get("inventoryid")));
-			inventory.setProductId(Long.parseLong(doc.get("inventoryproductid")));
 			inventory.setQuantity(Long.parseLong(doc.get("quantity")));
 		}
 		
 		return inventory;
 	}
 	
-	public boolean inventoryUpdate (long productId, long newQuantity) throws Exception {
+	public boolean inventoryUpdate (Inventory inventory) throws Exception {
 		
 		try {
-			Inventory inventory = inventorySearchByProductId(productId);
-
-			Term updateTerm = new Term("inventoryid", "" + inventory.getInventoryId());		
+			Term updateTerm = new Term("inventoryid", "" + inventory.getInventoryId());
 			Document newDoc = new Document();
 			
 			newDoc.add(new TextField("inventoryid", "" + inventory.getInventoryId(), Store.YES));
-			newDoc.add(new TextField("inventoryproductid", "" + inventory.getProductId(), Store.YES));
-			newDoc.add(new TextField("quantity", "" + newQuantity, Store.YES));
+			newDoc.add(new TextField("quantity", "" + inventory.getQuantity(), Store.YES));
 			
 			update(newDoc, updateTerm);
 			return true;
@@ -97,12 +97,13 @@ public class InventoryService {
 		}
 	}
 	
-//	public boolean inventoryUpdate (long productId, long quantity) throws Exception {
+
+//	public boolean inventoryUpdate (Inventory newInventory) throws Exception {
 //		
 //		try {
-//			Inventory inventory = inventorySearchByProductId(productId);
+//			Inventory inventory = inventorySearchById(newInventory.getInventoryId());
 //			
-//			long newQuantity = inventory.getQuantity() + quantity;
+//			long newQuantity = inventory.getQuantity() + newInventory.getQuantity();
 //			if (newQuantity < 0) {
 //				throw new Exception("재고 수량이 " + (-newQuantity) + "개 부족합니다.");
 //			} else if (newQuantity > 1000) {
@@ -113,7 +114,6 @@ public class InventoryService {
 //			Document newDoc = new Document();
 //			
 //			newDoc.add(new TextField("inventoryid", "" + inventory.getInventoryId(), Store.YES));
-//			newDoc.add(new TextField("inventoryproductid", "" + inventory.getProductId(), Store.YES));
 //			newDoc.add(new TextField("quantity", "" + newQuantity, Store.YES));
 //			
 //			update(newDoc, updateTerm);

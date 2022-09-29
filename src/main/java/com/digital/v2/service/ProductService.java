@@ -7,25 +7,16 @@ import static com.digital.v2.lucene.DataHandler.write;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.document.Field.Store;
 import org.springframework.stereotype.Component;
 
-import com.digital.v2.schema.Category;
-import com.digital.v2.schema.Inventory;
 import com.digital.v2.schema.Product;
 import com.digital.v2.schema.ProductList;
 
 @Component
 public class ProductService {
-	
-	@Resource
-	CategoryService categorySvc;
-	@Resource
-	InventoryService inventorySvc;
 	
 	public boolean productWrite (Product product) throws Exception {
 		
@@ -37,11 +28,16 @@ public class ProductService {
 			
 			// 중복이 아니면 write
 			product.setProductId(System.currentTimeMillis());
-			List<Document> docList = setPluralDoc(product);
+			product.setInventoryId(System.currentTimeMillis() + 1);
+			Document doc = new Document();
 			
-			for (Document document : docList) {
-				write(document);
-			}		
+			doc.add(new TextField("productid", "" + product.getProductId(), Store.YES));
+			doc.add(new TextField("price", "" + product.getPrice(), Store.YES));
+			doc.add(new TextField("productname", "" + product.getProductName(), Store.YES));
+			doc.add(new TextField("productcategoryid", "" + product.getCategoryId(), Store.YES));
+			doc.add(new TextField("productinventoryid", "" + product.getInventoryId(), Store.YES));
+			
+			write(doc);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -58,22 +54,11 @@ public class ProductService {
 		
 		Product product = new Product();
 		if (productDoc != null) {
-			
-			// product set
 			product.setProductId(Long.parseLong(productDoc.get("productid")));
 			product.setPrice(Long.parseLong(productDoc.get("price")));
 			product.setProductName(productDoc.get("productname"));
-			
-			// category set
-			Document categoryDoc = getPartyCategory(product);
-			Category category = categorySvc.categorySearchById(Long.parseLong(categoryDoc.get("partycategoryid")));
-			
-			product.setCategory(category);
-			
-			// inventory set
-			Inventory inventory = inventorySvc.inventorySearchByProductId(product.getProductId());
-			
-			product.setInventory(inventory);
+			product.setCategoryId(Long.parseLong(productDoc.get("productcategoryid")));
+			product.setInventoryId(Long.parseLong(productDoc.get("productinventoryid")));
 		}
 		
 		return product;
@@ -92,22 +77,11 @@ public class ProductService {
 			
 			Product product = new Product();
 			if (productDoc != null) {
-				
-				// product set
 				product.setProductId(Long.parseLong(productDoc.get("productid")));
 				product.setPrice(Long.parseLong(productDoc.get("price")));
 				product.setProductName(productDoc.get("productname"));
-				
-				// category set
-				Document categoryDoc = getPartyCategory(product);
-				Category category = categorySvc.categorySearchById(Long.parseLong(categoryDoc.get("partycategoryid")));
-				
-				product.setCategory(category);
-				
-				// inventory set
-				Inventory inventory = inventorySvc.inventorySearchByProductId(product.getProductId());
-				
-				product.setInventory(inventory);
+				product.setCategoryId(Long.parseLong(productDoc.get("productcategoryid")));
+				product.setInventoryId(Long.parseLong(productDoc.get("productinventoryid")));
 			}
 			products.add(product);
 		}
@@ -117,56 +91,23 @@ public class ProductService {
 		return productList;
 	}
 	
-	public List<Document> setPluralDoc (Product product) {
+	public Product productSearchById (long productId) throws Exception {
 		
-		List<Document> docList = new ArrayList<Document>();
+		String key = "productid";
+		String value = "" + productId;
 		
-		// product doc add
-		Document productDoc = new Document();
+		Document productDoc = findHardly(key, value);
 		
-		productDoc.add(new TextField("productid", "" + product.getProductId(), Store.YES));
-		productDoc.add(new TextField("price", "" + product.getPrice(), Store.YES));
-		productDoc.add(new TextField("productname", "" + product.getProductName(), Store.YES));
-		
-		docList.add(productDoc);
-		
-		// category & party category doc add
-		Category category = product.getCategory();
-		try {
-			if (categorySvc.categoryWrite(category)) {
-				docList.add(setPartyCategory(product, categorySvc.categorySearch(category.getCategoryName())));
-			}
-		} catch (Exception e) {
-			try {
-				docList.add(setPartyCategory(product, categorySvc.categorySearch(category.getCategoryName())));
-			} catch (Exception e1) {}
+		Product product = new Product();
+		if (productDoc != null) {
+			product.setProductId(Long.parseLong(productDoc.get("productid")));
+			product.setPrice(Long.parseLong(productDoc.get("price")));
+			product.setProductName(productDoc.get("productname"));
+			product.setCategoryId(Long.parseLong(productDoc.get("productcategoryid")));
+			product.setInventoryId(Long.parseLong(productDoc.get("productinventoryid")));
 		}
 		
-		// inventory doc add
-		Inventory inventory = product.getInventory();
-		inventory.setProductId(product.getProductId());
-		try {
-			inventorySvc.inventoryWrite(inventory);
-		} catch (Exception e) {}
-		
-		return docList;
+		return product;
 	}
 
-
-	public Document setPartyCategory (Product product, Category category) {
-		
-		Document doc = new Document();
-		
-		doc.add(new TextField("partycategoryid", "" + category.getCategoryId(), Store.YES));
-		doc.add(new TextField("partycategoryproductid", "" + product.getProductId(), Store.YES));
-		
-		return doc;
-	}
-	
-	public Document getPartyCategory (Product product) {
-
-		Document doc = findHardly("partycategoryproductid", "" + product.getProductId());
-
-		return doc;
-	}
 }

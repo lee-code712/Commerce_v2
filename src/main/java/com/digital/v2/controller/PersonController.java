@@ -1,6 +1,7 @@
 package com.digital.v2.controller;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -61,7 +62,8 @@ public class PersonController {
 		@ApiResponse(code = 200, message = "성공", response = SuccessMsg.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> login (@Parameter(name = "로그인 검증", description = "", required = true) @RequestBody Person person) {
+	public ResponseEntity<?> login (@Parameter(name = "로그인 검증", description = "", required = true) @RequestBody Person person,
+			HttpSession session) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		SuccessMsg success = new SuccessMsg();
@@ -72,6 +74,8 @@ public class PersonController {
 			}
 			success.setSuccessCode(200);
 			success.setSuccessMsg("로그인에 성공했습니다.");
+			
+			session.setAttribute("loginId", person.getLoginId());	// 세션에 사용자 로그인 id 저장
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
