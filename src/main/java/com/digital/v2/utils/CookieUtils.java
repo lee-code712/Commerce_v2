@@ -143,6 +143,18 @@ public class CookieUtils {
 	}
 	
 	/**
+	 * @description 쿠키 삭제
+	 * @params
+	 */
+	public static void deleteCookie(String key, HttpServletResponse response)
+			throws UnsupportedEncodingException {
+	    Cookie cookie = new Cookie(key, "");
+	    cookie.setPath("/");
+	    cookie.setMaxAge(0);
+	    response.addCookie(cookie);
+	}
+	
+	/**
 	 * @description 모든 쿠키 삭제
 	 * @params
 	 */

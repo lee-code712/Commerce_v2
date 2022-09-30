@@ -1,6 +1,7 @@
 package com.digital.v2.controller;
 
 import static com.digital.v2.utils.CookieUtils.getValueList;
+import static com.digital.v2.utils.CookieUtils.deleteCookie;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.digital.v2.schema.ErrorMsg;
-import com.digital.v2.schema.ProductList;
 import com.digital.v2.schema.Purchase;
 import com.digital.v2.schema.PurchaseDetail;
 import com.digital.v2.service.PurchaseService;
@@ -76,7 +77,7 @@ public class PurchaseController {
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
 	public ResponseEntity<?> purchaseWithCart (@Parameter(name = "장바구니 상품 일괄 구매", description = "", required = true) @RequestBody Purchase purchase,
-			HttpServletRequest request) {
+			HttpServletRequest request, HttpServletResponse response) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		String token = request.getHeader("Authorization");
@@ -91,6 +92,8 @@ public class PurchaseController {
 				
 				if (purchaseSvc.purchaseWithCartWrite(cartItemStringList, purchase)) {
 					resPurchaseList = purchaseSvc.purchaseSearch(purchase.getPurchaseDate());
+					// 장바구니 삭제
+					deleteCookie("cart", response);
 				}
 			}
 		} catch (Exception e) {
