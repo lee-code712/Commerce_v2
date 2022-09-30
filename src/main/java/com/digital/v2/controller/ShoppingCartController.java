@@ -55,7 +55,7 @@ public class ShoppingCartController {
 		
 		try {
 			List<String> cartItemStringList = getValueList("cart", request);
-			// 상품을 장바구니에 추가할 수 있는지 확인
+			
 			if (shoppingCartSvc.cartItemCheck(cartItemStringList, cartItem)) {
 				String value = cartItem.getProductId() + "/" + cartItem.getPurchaseNumber();
 				setCookieValue("cart", value, 1, request, response);
@@ -84,7 +84,7 @@ public class ShoppingCartController {
 		
 		try {
 			List<String> cartItemStringList = getValueList("cart", request);
-			// 상품이 장바구니에 있는지 확인
+			
 			if (!shoppingCartSvc.cartItemIsExist(cartItemStringList, cartItem)) {
 				return ExceptionUtils.setException(errors, 500, "장바구니에 상품이 없습니다.", header);
 			}

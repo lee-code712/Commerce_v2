@@ -119,30 +119,4 @@ public class InventoryService {
 		}
 	}
 	
-
-//	public boolean inventoryUpdate (Inventory newInventory) throws Exception {
-//		
-//		try {
-//			Inventory inventory = inventorySearchById(newInventory.getInventoryId());
-//			
-//			long newQuantity = inventory.getQuantity() + newInventory.getQuantity();
-//			if (newQuantity < 0) {
-//				throw new Exception("재고 수량이 " + (-newQuantity) + "개 부족합니다.");
-//			} else if (newQuantity > 1000) {
-//				throw new Exception("재고 수량은 1000개를 넘을 수 없습니다.");
-//			}
-//
-//			Term updateTerm = new Term("inventoryid", "" + inventory.getInventoryId());		
-//			Document newDoc = new Document();
-//			
-//			newDoc.add(new TextField("inventoryid", "" + inventory.getInventoryId(), Store.YES));
-//			newDoc.add(new TextField("quantity", "" + newQuantity, Store.YES));
-//			
-//			update(newDoc, updateTerm);
-//			return true;
-//		} catch (Exception e) {
-//			throw e;
-//		}
-//	}
-	
 }

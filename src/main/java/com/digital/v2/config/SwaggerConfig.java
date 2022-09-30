@@ -28,8 +28,8 @@ public class SwaggerConfig {
 				.consumes(getConsumeContentTypes()).produces(getProduceContentTypes()).select()
 				.apis(RequestHandlerSelectors.any()).paths(PathSelectors.ant("/rest/**")) // 그 중 /rest/** 인 URL들만 필터링
 				.build()
-				.securityContexts(Arrays.asList(securityContext()))
-				.securitySchemes(Arrays.asList(apiKey()));
+				.securityContexts(Arrays.asList(securityContext()))	// 설정 추가
+				.securitySchemes(Arrays.asList(apiKey()));	// 설정 추가
 	}
 	
 	private Set<String> getConsumeContentTypes() {
@@ -49,7 +49,7 @@ public class SwaggerConfig {
         return new ApiKey("JWT", "Authorization", "header");
     }
 	
-    //전역 AuthorizationScope를 사용하여 JWT SecurityContext를 구성.
+    // 전역 AuthorizationScope를 사용하여 JWT SecurityContext를 구성.
     private SecurityContext securityContext() {
         return SecurityContext.builder()
                 .securityReferences(defaultAuth())

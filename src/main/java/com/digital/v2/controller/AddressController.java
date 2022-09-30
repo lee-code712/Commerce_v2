@@ -55,6 +55,9 @@ public class AddressController {
 		return new ResponseEntity<Address>(resAddress, header, HttpStatus.valueOf(200));
 	}
 	
+	// 사용자 주소 추가
+	// 사용자 주소 삭제
+	
 	@RequestMapping(value = "/inquiry/{addressDetail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "주소 검색", notes = "주소 상세로 주소 정보를 검색하기 위한 API.")
 	@ApiResponses({

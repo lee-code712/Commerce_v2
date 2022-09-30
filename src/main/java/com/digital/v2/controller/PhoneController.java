@@ -54,6 +54,9 @@ public class PhoneController {
 		return new ResponseEntity<Phone>(resPhone, header, HttpStatus.valueOf(200));
 	}
 	
+	// 사용자 전화번호 추가
+	// 사용자 전화번호 삭제
+	
 	@RequestMapping(value = "/inquiry/{phoneNumber}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "전화번호 검색", notes = "전화번호 상세로 전화번호 정보를 검색하기 위한 API.")
 	@ApiResponses({
