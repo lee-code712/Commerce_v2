@@ -15,13 +15,16 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.digital.v2.schema.ErrorMsg;
+import com.digital.v2.schema.ProductList;
 import com.digital.v2.schema.Purchase;
+import com.digital.v2.schema.PurchaseDetail;
 import com.digital.v2.service.PurchaseService;
 import com.digital.v2.utils.ExceptionUtils;
 
@@ -84,7 +87,7 @@ public class PurchaseController {
 			
 			if (cartItemStringList != null) {	
 				purchase.setPersonId(Long.valueOf(token));	// 토큰에서 사용자 id를 가져와 set
-				purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));	// 현재 날짜 구해서 set
+				purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));	// 현재 날짜 구해서 set
 				
 				if (purchaseSvc.purchaseWithCartWrite(cartItemStringList, purchase)) {
 					resPurchaseList = purchaseSvc.purchaseSearch(purchase.getPurchaseDate());
@@ -98,5 +101,21 @@ public class PurchaseController {
 	}
 
 	// 날짜로 구매 상세 조회
-	
+	@RequestMapping(value = "/inquiry/{purchaseDate}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "구매 목록 조회", notes = "특정 날짜의 구매 목록을 검색하는 API.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message = "성공", response = List.class),
+		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)	// 에러를 담고 있는 schema를 따로 생성해서 사용
+	})
+	public ResponseEntity<?> productSearchByCategory (@PathVariable String purchaseDate) {
+		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
+		ErrorMsg errors = new ErrorMsg();
+		
+		try {
+			List<PurchaseDetail> purchaseList = purchaseSvc.purchaseDetailSearch(purchaseDate);
+			return new ResponseEntity<List<PurchaseDetail>>(purchaseList, header, HttpStatus.valueOf(200));
+		} catch (Exception e) {
+			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
+		}
+	}
 }

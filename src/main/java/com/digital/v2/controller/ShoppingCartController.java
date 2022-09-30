@@ -116,7 +116,7 @@ public class ShoppingCartController {
 			List<String> cartItemStringList = getValueList("cart", request);
 			
 			if (cartItemStringList != null) {
-				cart = shoppingCartSvc.setCart(cartItemStringList);		
+				cart = shoppingCartSvc.setShoppingCart(cartItemStringList);		
 			}	
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);

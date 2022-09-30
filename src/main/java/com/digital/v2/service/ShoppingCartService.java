@@ -58,9 +58,9 @@ public class ShoppingCartService {
 		}
 	}
 		
-	public ShoppingCart setCart (List<String> cartItemStringList) {
+	public ShoppingCart setShoppingCart (List<String> cartItemStringList) {
 		
-		ShoppingCart shoppingCart = new ShoppingCart();
+		ShoppingCart cart = new ShoppingCart();
 		List<ShoppingCartItem> cartItemList = new ArrayList<ShoppingCartItem>();
 		
 		for (String cartItemString : cartItemStringList) {
@@ -72,9 +72,9 @@ public class ShoppingCartService {
 			cartItemList.add(cartItem);
 		}
 		
-		shoppingCart.setShoppingCart(cartItemList);
+		cart.setShoppingCart(cartItemList);
 		
-		return shoppingCart;
+		return cart;
 	}
 	
 }
