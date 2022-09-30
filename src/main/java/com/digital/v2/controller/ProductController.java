@@ -55,18 +55,36 @@ public class ProductController {
 		return new ResponseEntity<Product>(resProduct, header, HttpStatus.valueOf(200));
 	}
 
-	@RequestMapping(value = "/inquiry/list/{keyword}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "상품 키워드 검색", notes = "특정 단어를 포함하는 상품명으로 상품을 검색하는 API.")
+	@RequestMapping(value = "/inquiry/byKeyword/{keyword}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "상품명 키워드 검색", notes = "특정 단어를 포함하는 상품명으로 상품을 검색하는 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = ProductList.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)	// 에러를 담고 있는 schema를 따로 생성해서 사용
 	})
-	public ResponseEntity<?> productListsearch (@PathVariable String keyword) {
+	public ResponseEntity<?> productSearchBykeyword (@PathVariable String keyword) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
 		try {
 			ProductList products = productSvc.productSearchByKeyword(keyword);
+			return new ResponseEntity<ProductList>(products, header, HttpStatus.valueOf(200));
+		} catch (Exception e) {
+			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
+		}
+	}
+	
+	@RequestMapping(value = "/inquiry/byCategory/{categoryName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "카테고리별 상품 검색", notes = "특정 카테고리의 상품을 검색하는 API.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message = "성공", response = ProductList.class),
+		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)	// 에러를 담고 있는 schema를 따로 생성해서 사용
+	})
+	public ResponseEntity<?> productSearchByCategory (@PathVariable String categoryName) {
+		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
+		ErrorMsg errors = new ErrorMsg();
+		
+		try {
+			ProductList products = productSvc.productSearchByCategory(categoryName);
 			return new ResponseEntity<ProductList>(products, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);

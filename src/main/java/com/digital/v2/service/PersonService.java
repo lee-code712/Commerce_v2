@@ -30,7 +30,7 @@ public class PersonService {
 		
 		try {
 			// person 중복 여부 확인
-			if (personSearch(person.getLoginId()).getLoginId() != null) {
+			if (personSearch(person.getPersonName()).getPersonName() != null) {
 				throw new Exception("이미 가입된 회원정보입니다.");
 			}
 
@@ -47,24 +47,24 @@ public class PersonService {
 		}
 	}
 	
-	public boolean login (Person person) throws Exception {
+	public Person login (Person person) throws Exception {
 		
-		Person findPerson = personSearch(person.getLoginId());
+		Person findPerson = personSearch(person.getPersonName());
 		
-		if (findPerson.getLoginId() == null) {
-			return false;
+		if (findPerson.getPersonName() == null) {
+			return null;
 		}
 		else if (!person.getPassword().equals(findPerson.getPassword())) {
 			throw new Exception("비밀번호가 일치하지 않습니다.");
 		}
 		
-		return true;
+		return findPerson;
 	}
 	
-	public Person personSearch (String loginId) throws Exception {
+	public Person personSearch (String personName) throws Exception {
 		
-		String key = "loginid";
-		String value = loginId;
+		String key = "personname";
+		String value = personName;
 		
 		Document personDoc = findHardly(key, value);
 		
@@ -73,10 +73,9 @@ public class PersonService {
 			
 			// person set
 			person.setPersonId(Long.parseLong(personDoc.get("personid")));
-			person.setLoginId(personDoc.get("loginid"));
+			person.setPersonName(personDoc.get("personname"));
 			person.setPassword(personDoc.get("password"));
 			person.setGender(personDoc.get("gender"));
-			person.setPersonName(personDoc.get("personname"));
 			
 			// address list set
 			List<Document> partyAddressDocList = getPartyAddress(person);
@@ -112,9 +111,8 @@ public class PersonService {
 		Document personDoc = new Document();
 
 		personDoc.add(new TextField("personid", "" + person.getPersonId(), Store.YES));
-		personDoc.add(new TextField("loginid", "" + person.getLoginId(), Store.YES));
-		personDoc.add(new TextField("password", "" + person.getPassword(), Store.YES));
 		personDoc.add(new TextField("personname", "" + person.getPersonName(), Store.YES));
+		personDoc.add(new TextField("password", "" + person.getPassword(), Store.YES));
 		personDoc.add(new TextField("gender", "" + person.getGender(), Store.YES));
 
 		docList.add(personDoc);

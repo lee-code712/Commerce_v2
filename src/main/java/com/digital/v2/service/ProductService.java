@@ -7,16 +7,22 @@ import static com.digital.v2.lucene.DataHandler.write;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.document.Field.Store;
 import org.springframework.stereotype.Component;
 
+import com.digital.v2.schema.Category;
 import com.digital.v2.schema.Product;
 import com.digital.v2.schema.ProductList;
 
 @Component
 public class ProductService {
+	
+	@Resource
+	CategoryService categorySvc;
 	
 	public boolean productWrite (Product product) throws Exception {
 		
@@ -87,6 +93,39 @@ public class ProductService {
 		}
 		
 		productList.setProducts(products);
+		
+		return productList;
+	}
+	
+	public ProductList productSearchByCategory (String categoryName) throws Exception {
+		
+		String key = "productcategoryid";
+		String value;
+		
+		Category category = categorySvc.categorySearch(categoryName);
+
+		ProductList productList = new ProductList();
+		if (category.getCategoryName() != null) {
+			value = "" + category.getCategoryId();
+			
+			List<Document> productDocList = wildCardQuery(key, value);
+			
+			List<Product> products = new ArrayList<Product>();	
+			for (Document productDoc : productDocList) {
+	 
+				Product product = new Product();
+				if (productDoc != null) {
+					product.setProductId(Long.parseLong(productDoc.get("productid")));
+					product.setPrice(Long.parseLong(productDoc.get("price")));
+					product.setProductName(productDoc.get("productname"));
+					product.setCategoryId(Long.parseLong(productDoc.get("productcategoryid")));
+					product.setInventoryId(Long.parseLong(productDoc.get("productinventoryid")));
+				}
+				products.add(product);
+			}
+			
+			productList.setProducts(products);
+		}
 		
 		return productList;
 	}

@@ -81,6 +81,28 @@ public class InventoryService {
 		return inventory;
 	}
 	
+	public Inventory inventorySearchByProductId (long productId) throws Exception {
+		
+		String key = "inventoryid";
+		String value;
+		
+		Product product = productSvc.productSearchById(productId);
+		
+		Inventory inventory = new Inventory();
+		if (product.getProductName() != null) {
+			value = "" + product.getInventoryId();
+			
+			Document doc = findHardly(key, value);
+			
+			if (doc != null) {
+				inventory.setInventoryId(Long.parseLong(doc.get("inventoryid")));
+				inventory.setQuantity(Long.parseLong(doc.get("quantity")));
+			}
+		}
+		
+		return inventory;
+	}
+	
 	public boolean inventoryUpdate (Inventory inventory) throws Exception {
 		
 		try {

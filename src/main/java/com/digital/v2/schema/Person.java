@@ -16,22 +16,19 @@ public class Person {
 	@ApiModelProperty(required = false, position = 1, notes = "고객 ID", example = "0", dataType = "long")
 	private long personId;
 	
-	@ApiModelProperty(required = true, position = 2, notes = "로그인 ID", example = "로그인 ID", dataType = "string")
-	private String loginId;
+	@ApiModelProperty(required = true, position = 2, notes = "고객명", example = "고객명", dataType = "string")
+	private String personName;
 	
 	@ApiModelProperty(required = true, position = 3, notes = "패스워드", example = "패스워드", dataType = "string")
 	private String password;
 	
-	@ApiModelProperty(required = true, position = 4, notes = "고객명", example = "고객명", dataType = "string")
-	private String personName;
-	
-	@ApiModelProperty(required = true, position = 5, notes = "고객 성별", example = "F/M", dataType = "string")
+	@ApiModelProperty(required = true, position = 4, notes = "고객 성별", example = "F/M", dataType = "string")
 	private String gender;
 	
-	@ApiModelProperty(required = true, position = 6, notes = "고객 전화번호 목록", example = "", dataType = "array")
+	@ApiModelProperty(required = true, position = 5, notes = "고객 전화번호 목록", example = "", dataType = "array")
 	private List<Phone> phoneList;
 	
-	@ApiModelProperty(required = true, position = 7, notes = "고객 주소 목록", example = "", dataType = "array")
+	@ApiModelProperty(required = true, position = 6, notes = "고객 주소 목록", example = "", dataType = "array")
 	private List<Address> addressList;
 
 	public long getPersonId() {
@@ -43,24 +40,6 @@ public class Person {
 		this.personId = personId;
 	}
 
-	public String getLoginId() {
-		String loginId = this.loginId;
-		return loginId;
-	}
-
-	public void setLoginId(String loginId) {
-		this.loginId = loginId;
-	}
-
-	public String getPassword() {
-		String password = this.password;
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
 	public String getPersonName() {
 		String personName = this.personName;
 		return personName;
@@ -68,6 +47,15 @@ public class Person {
 
 	public void setPersonName(String personName) {
 		this.personName = personName;
+	}
+	
+	public String getPassword() {
+		String password = this.password;
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String getGender() {

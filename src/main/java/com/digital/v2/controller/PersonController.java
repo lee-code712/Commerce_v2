@@ -1,7 +1,8 @@
 package com.digital.v2.controller;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,6 +27,8 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import static com.digital.v2.utils.CookieUtils.deleteAllCookie;
+
 @RestController
 @Tag(name = "고객", description = "Person Related API")
 @RequestMapping(value = "/rest/person")
@@ -47,7 +50,7 @@ public class PersonController {
 		Person resPerson = new Person();
 		try {
 			if (personSvc.signUp(person)) {
-				resPerson = personSvc.personSearch(person.getLoginId());
+				resPerson = personSvc.personSearch(person.getPersonName());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -62,20 +65,18 @@ public class PersonController {
 		@ApiResponse(code = 200, message = "성공", response = SuccessMsg.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> login (@Parameter(name = "로그인 검증", description = "", required = true) @RequestBody Person person,
-			HttpSession session) {
+	public ResponseEntity<?> login (@Parameter(name = "사용자 검증", description = "", required = true) @RequestBody Person person) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		SuccessMsg success = new SuccessMsg();
 		
 		try {
-			if (!personSvc.login(person)) {
+			Person resPerson = personSvc.login(person);
+			if (resPerson == null) {
 				return ExceptionUtils.setException(errors, 500, "로그인에 실패했습니다.", header);
 			}
 			success.setSuccessCode(200);
-			success.setSuccessMsg("로그인에 성공했습니다.");
-			
-			session.setAttribute("loginId", person.getLoginId());	// 세션에 사용자 로그인 id 저장
+			success.setSuccessMsg("Access Token: " + resPerson.getPersonId());
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
@@ -83,18 +84,41 @@ public class PersonController {
 		return new ResponseEntity<SuccessMsg>(success, header, HttpStatus.valueOf(200));
 	}
 	
-	@RequestMapping(value = "/inquiry/{loginId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "회원 검색", notes = "회원의 ID로 회원정보를 검색하기 위한 API.")
+	@RequestMapping(value = "/logout", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "로그아웃", notes = "로그아웃을 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> personSearch (@PathVariable String loginId) throws Exception {
+	public ResponseEntity<?> logout (HttpServletRequest request, HttpServletResponse response) throws Exception {
+		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
+		ErrorMsg errors = new ErrorMsg();
+		SuccessMsg success = new SuccessMsg();
+		
+		try {
+			deleteAllCookie(request, response);	// 모든 cookie 삭제
+			
+			success.setSuccessCode(200);
+			success.setSuccessMsg("로그아웃 되었습니다.");
+		} catch (Exception e) {
+			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
+		}
+		
+		return new ResponseEntity<SuccessMsg>(success, header, HttpStatus.valueOf(200));
+	}
+	
+	@RequestMapping(value = "/inquiry/{personName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "회원 검색", notes = "회원명으로 회원정보를 검색하기 위한 API.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message = "성공", response = Person.class),
+		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
+	})
+	public ResponseEntity<?> personSearch (@PathVariable String personName) throws Exception {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
 		try {
-			Person person = personSvc.personSearch(loginId);
+			Person person = personSvc.personSearch(personName);
 			return new ResponseEntity<Person>(person, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
