@@ -32,20 +32,24 @@ public class PhoneController {
 	@Resource
 	private PhoneService phoneSvc;
 	
+	/**
+	 * @description 전화번호 등록
+	 * @params phone: 전화번호 정보 (phoneNumber)
+	 */
 	@RequestMapping(value = "/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "전화번호 등록", notes = "전화번호를 등록하기 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Phone.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> phoneWrite (@Parameter(name = "전화번호 등록", description = "", required = true) @RequestBody Phone phone) {
+	public ResponseEntity<?> phoneWrite (@Parameter(name = "전화번호 정보", required = true) @RequestBody Phone phone) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
 		Phone resPhone = new Phone();
 		try {
 			if (phoneSvc.phoneWrite(phone)) {
-				resPhone = phoneSvc.phoneSearch(phone.getPhoneNumber());
+				resPhone = phoneSvc.phoneSearch("phonenumber", phone.getPhoneNumber());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -53,22 +57,23 @@ public class PhoneController {
 		
 		return new ResponseEntity<Phone>(resPhone, header, HttpStatus.valueOf(200));
 	}
-	
-	// 사용자 전화번호 추가
-	// 사용자 전화번호 삭제
-	
+
+	/**
+	 * @description 전화번호 검색
+	 * @params phoneNumber: 검색 키워드
+	 */
 	@RequestMapping(value = "/inquiry/{phoneNumber}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "전화번호 검색", notes = "전화번호 상세로 전화번호 정보를 검색하기 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Phone.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> phoneSearch (@PathVariable String phoneNumber) {
+	public ResponseEntity<?> phoneSearch (@Parameter(name = "전화번호 상세", required = true) @PathVariable String phoneNumber) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
 		try {
-			Phone phone = phoneSvc.phoneSearch(phoneNumber);
+			Phone phone = phoneSvc.phoneSearch("phonenumber", phoneNumber);
 			return new ResponseEntity<Phone>(phone, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);

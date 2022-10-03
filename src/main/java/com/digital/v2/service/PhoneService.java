@@ -17,7 +17,7 @@ public class PhoneService {
 
 		try {
 			// phone 중복 여부 확인
-			if (phoneSearch(phone.getPhoneNumber()).getPhoneNumber() != null) {
+			if (phoneSearch("phonenumber", phone.getPhoneNumber()).getPhoneNumber() != null) {
 				throw new Exception("이미 등록된 전화번호입니다."); 
 			}
 			
@@ -35,26 +35,7 @@ public class PhoneService {
 		}
 	}
 	
-	public Phone phoneSearch (String phoneNumber) throws Exception {
-		
-		String key = "phonenumber";
-		String value = phoneNumber;
-		
-		Document doc = findHardly(key, value);
-		
-		Phone phone = new Phone();
-		if (doc != null) {
-			phone.setPhoneId(Long.parseLong(doc.get("phoneid")));
-			phone.setPhoneNumber(doc.get("phonenumber"));
-		}
-		
-		return phone;
-	}
-	
-	public Phone phoneSearchById (long phoneId) throws Exception {
-		
-		String key = "phoneid";
-		String value = "" + phoneId;
+	public Phone phoneSearch (String key, String value) throws Exception {
 		
 		Document doc = findHardly(key, value);
 		

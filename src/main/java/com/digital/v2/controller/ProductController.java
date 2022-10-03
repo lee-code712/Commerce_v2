@@ -46,7 +46,7 @@ public class ProductController {
 		Product resProduct = new Product();
 		try {
 			if (productSvc.productWrite(product)) {
-				resProduct = productSvc.productSearch(product.getProductName());
+				resProduct = productSvc.productSearch("productname", product.getProductName());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -102,7 +102,7 @@ public class ProductController {
 		ErrorMsg errors = new ErrorMsg();
 		
 		try {
-			Product product = productSvc.productSearch(productName);
+			Product product = productSvc.productSearch("productname", productName);
 			return new ResponseEntity<Product>(product, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);

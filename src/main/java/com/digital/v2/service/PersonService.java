@@ -93,7 +93,7 @@ public class PersonService {
 			
 			List<Address> addressList = new ArrayList<Address>();
 			for (Document partyAddressDoc : partyAddressDocList) {
-				Address address = addressSvc.addressSearchById(Long.parseLong(partyAddressDoc.get("partyaddressid")));
+				Address address = addressSvc.addressSearch("addressid", partyAddressDoc.get("partyaddressid"));
 				addressList.add(address);
 			}
 
@@ -104,7 +104,7 @@ public class PersonService {
 			
 			List<Phone> phoneList = new ArrayList<Phone>();
 			for (Document partyPhoneDoc : partyPhoneDocList) {
-				Phone phone = phoneSvc.phoneSearchById(Long.parseLong(partyPhoneDoc.get("partyphoneid")));
+				Phone phone = phoneSvc.phoneSearch("phoneid", partyPhoneDoc.get("partyphoneid"));
 				phoneList.add(phone);
 			}
 
@@ -133,11 +133,11 @@ public class PersonService {
 		for (Address address : addressList) {
 			try {
 				if (addressSvc.addressWrite(address)) {
-					docList.add(setPartyAddressDoc(person, addressSvc.addressSearch(address.getAddressDetail())));
+					docList.add(setPartyAddressDoc(person, addressSvc.addressSearch("addressdetail", address.getAddressDetail())));
 				}
 			} catch (Exception e) {
 				try {
-					docList.add(setPartyAddressDoc(person, addressSvc.addressSearch(address.getAddressDetail())));
+					docList.add(setPartyAddressDoc(person, addressSvc.addressSearch("addressdetail", address.getAddressDetail())));
 				} catch (Exception e1) {}
 			}
 		}
@@ -147,11 +147,11 @@ public class PersonService {
 		for (Phone phone : phoneList) {
 			try {
 				if (phoneSvc.phoneWrite(phone)) {
-					docList.add(setPartyPhoneDoc(person, phoneSvc.phoneSearch(phone.getPhoneNumber())));
+					docList.add(setPartyPhoneDoc(person, phoneSvc.phoneSearch("phonenumber", phone.getPhoneNumber())));
 				}
 			} catch (Exception e) {
 				try {
-					docList.add(setPartyPhoneDoc(person, phoneSvc.phoneSearch(phone.getPhoneNumber())));
+					docList.add(setPartyPhoneDoc(person, phoneSvc.phoneSearch("phonenumber", phone.getPhoneNumber())));
 				} catch (Exception e1) {}
 			}
 		}

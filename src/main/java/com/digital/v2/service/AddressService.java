@@ -18,7 +18,7 @@ public class AddressService {
 
 		try {
 			// address 중복 여부 확인
-			if (addressSearch(address.getAddressDetail()).getAddressDetail() != null) {
+			if (addressSearch("addressdetail", address.getAddressDetail()).getAddressDetail() != null) {
 				throw new Exception("이미 등록된 주소입니다."); 
 			} 
 	
@@ -36,10 +36,7 @@ public class AddressService {
 		}
 	}
 	
-	public Address addressSearch (String addressDetail) throws Exception {
-		
-		String key = "addressdetail";
-		String value = addressDetail;
+	public Address addressSearch (String key, String value) throws Exception {
 		
 		Document doc = findHardly(key, value);
 		
@@ -50,22 +47,6 @@ public class AddressService {
 		}
 		
 		return address;
-	}
-	
-	public Address addressSearchById (long addressId) throws Exception {
-		
-		String key = "addressid";
-		String value = "" + addressId;
-		
-		Document doc = findHardly(key, value);
-		
-		Address addr = new Address();
-		if (doc != null) {
-			addr.setAddressId(Long.parseLong(doc.get("addressid")));
-			addr.setAddressDetail(doc.get("addressdetail"));
-		}
-		
-		return addr;
 	}
 	
 }

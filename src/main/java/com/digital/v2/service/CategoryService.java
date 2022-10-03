@@ -17,7 +17,7 @@ public class CategoryService {
 		
 		try {
 			// category 중복 여부 확인
-			if (categorySearch(category.getCategoryName()).getCategoryName() != null) {
+			if (categorySearch("categoryname", category.getCategoryName()).getCategoryName() != null) {
 				throw new Exception("이미 등록된 카테고리입니다."); 
 			}
 			
@@ -35,26 +35,7 @@ public class CategoryService {
 		}
 	}
 	
-	public Category categorySearch (String categoryName) throws Exception {
-		
-		String key = "categoryname";
-		String value = categoryName;
-		
-		Document doc = findHardly(key, value);
-		
-		Category category = new Category();
-		if (doc != null) {
-			category.setCategoryId(Long.parseLong(doc.get("categoryid")));
-			category.setCategoryName(doc.get("categoryname"));
-		}
-		
-		return category;
-	}
-	
-	public Category categorySearchById (long categoryId) throws Exception {
-		
-		String key = "categoryid";
-		String value = "" + categoryId;
+	public Category categorySearch (String key, String value) throws Exception {
 		
 		Document doc = findHardly(key, value);
 		

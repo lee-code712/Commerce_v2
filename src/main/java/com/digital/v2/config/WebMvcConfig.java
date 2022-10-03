@@ -12,7 +12,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Override
     public void addInterceptors(InterceptorRegistry registry) {
 		
-		// 인증 관련 인터셉터 추가
+		// 인증 관련 인터셉터 설정
         registry.addInterceptor(new AuthInterceptor())
                 .addPathPatterns(AuthInterceptor.authEssential)
                 .excludePathPatterns(AuthInterceptor.authInessential);

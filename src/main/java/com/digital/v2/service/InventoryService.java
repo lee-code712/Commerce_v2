@@ -25,12 +25,11 @@ public class InventoryService {
 		
 		try {
 			// inventory 중복 여부 확인
-			if (inventorySearchById(inventory.getInventoryId()).getInventoryId() != 0) {
+			if (inventorySearch("inventoryid", "" + inventory.getInventoryId()).getInventoryId() != 0) {
 				throw new Exception("상품에 대한 재고가 이미 등록되어 있습니다.");
 			}
 			
 			// 중복이 아니면 write
-			
 			Document doc = new Document();
 			
 			doc.add(new TextField("inventoryid", "" + inventory.getInventoryId(), Store.YES));
@@ -43,12 +42,12 @@ public class InventoryService {
 		}
 	}
 	
-	public Inventory inventorySearch (String productName) throws Exception {
+	public Inventory inventorySearchByProduct (String productKey, String productValue) throws Exception {
 		
 		String key = "inventoryid";
 		String value;
 		
-		Product product = productSvc.productSearch(productName);
+		Product product = productSvc.productSearch(productKey, productValue);
 		
 		Inventory inventory = new Inventory();
 		if (product.getProductName() != null) {
@@ -65,10 +64,7 @@ public class InventoryService {
 		return inventory;
 	}
 	
-	public Inventory inventorySearchById (long inventoryId) throws Exception {
-		
-		String key = "inventoryid";
-		String value = "" + inventoryId;
+	public Inventory inventorySearch (String key, String value) throws Exception {
 		
 		Document doc = findHardly(key, value);
 		
@@ -76,28 +72,6 @@ public class InventoryService {
 		if (doc != null) {
 			inventory.setInventoryId(Long.parseLong(doc.get("inventoryid")));
 			inventory.setQuantity(Long.parseLong(doc.get("quantity")));
-		}
-		
-		return inventory;
-	}
-	
-	public Inventory inventorySearchByProductId (long productId) throws Exception {
-		
-		String key = "inventoryid";
-		String value;
-		
-		Product product = productSvc.productSearchById(productId);
-		
-		Inventory inventory = new Inventory();
-		if (product.getProductName() != null) {
-			value = "" + product.getInventoryId();
-			
-			Document doc = findHardly(key, value);
-			
-			if (doc != null) {
-				inventory.setInventoryId(Long.parseLong(doc.get("inventoryid")));
-				inventory.setQuantity(Long.parseLong(doc.get("quantity")));
-			}
 		}
 		
 		return inventory;

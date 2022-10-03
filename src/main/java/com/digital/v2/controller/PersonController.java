@@ -149,11 +149,11 @@ public class PersonController {
 	}
 	
 	/**
-	 * @description 회원 주소 정보 추가
+	 * @description 회원 주소 추가
 	 * @params address: 주소 정보 (addressId), request: personId token 값을 가져오기 위한 request 객체
 	 */
-	@RequestMapping(value = "/address/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "회원 주소 정보 추가", notes = "회원의 주소 정보를 추가하기 위한 API.")
+	@RequestMapping(value = "/partyAddress/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "회원 주소 추가", notes = "회원의 주소 정보를 추가로 등록하기 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
@@ -181,11 +181,11 @@ public class PersonController {
 	}
 	
 	/**
-	 * @description 회원 주소정보 삭제
-	 * @params address: 주소정보 (addressId), request: personId token 값을 가져오기 위한 request 객체
+	 * @description 회원 주소 삭제
+	 * @params address: 주소 (addressId), request: personId token 값을 가져오기 위한 request 객체
 	 */
-	@RequestMapping(value = "/address/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "회원 주소 정보 삭제", notes = "회원의 주소 정보를 삭제하기 위한 API.")
+	@RequestMapping(value = "/partyAddress/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "회원 주소 삭제", notes = "회원의 주소 정보를 삭제하기 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
@@ -213,11 +213,11 @@ public class PersonController {
 	}
 
 	/**
-	 * @description 회원 전화번호 정보 추가
+	 * @description 회원 전화번호 추가
 	 * @params phone: 전화번호 정보 (phoneId), request: personId token 값을 가져오기 위한 request 객체
 	 */
-	@RequestMapping(value = "/phone/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "회원 전화번호 정보 추가", notes = "회원의 전화번호 정보를 추가하기 위한 API.")
+	@RequestMapping(value = "/partyPhone/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "회원 전화번호 추가", notes = "회원의 전화번호 정보를 추가로 등록하기 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
@@ -245,11 +245,11 @@ public class PersonController {
 	}
 	
 	/**
-	 * @description 회원 전화번호 정보 삭제
+	 * @description 회원 전화번호 삭제
 	 * @params phone: 전화번호 정보 (phoneId), request: personId token 값을 가져오기 위한 request 객체
 	 */
-	@RequestMapping(value = "/phone/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "회원 전화번호 정보 삭제", notes = "회원의 전화번호 정보를 삭제하기 위한 API.")
+	@RequestMapping(value = "/partyPhone/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "회원 전화번호 삭제", notes = "회원의 전화번호 정보를 삭제하기 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)

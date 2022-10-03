@@ -28,7 +28,7 @@ public class ProductService {
 		
 		try {
 			// product 중복 여부 확인
-			if (productSearch(product.getProductName()).getProductName() != null) {
+			if (productSearch("productname", product.getProductName()).getProductName() != null) {
 				throw new Exception("이미 등록된 상품입니다.");
 			}
 			
@@ -51,10 +51,7 @@ public class ProductService {
 	}
 
 
-	public Product productSearch (String productName) throws Exception {
-		
-		String key = "productname";
-		String value = productName;
+	public Product productSearch (String key, String value) throws Exception {
 		
 		Document productDoc = findHardly(key, value);
 		
@@ -102,7 +99,7 @@ public class ProductService {
 		String key = "productcategoryid";
 		String value;
 		
-		Category category = categorySvc.categorySearch(categoryName);
+		Category category = categorySvc.categorySearch("categoryname", categoryName);
 
 		ProductList productList = new ProductList();
 		if (category.getCategoryName() != null) {
@@ -128,25 +125,6 @@ public class ProductService {
 		}
 		
 		return productList;
-	}
-	
-	public Product productSearchById (long productId) throws Exception {
-		
-		String key = "productid";
-		String value = "" + productId;
-		
-		Document productDoc = findHardly(key, value);
-		
-		Product product = new Product();
-		if (productDoc != null) {
-			product.setProductId(Long.parseLong(productDoc.get("productid")));
-			product.setPrice(Long.parseLong(productDoc.get("price")));
-			product.setProductName(productDoc.get("productname"));
-			product.setCategoryId(Long.parseLong(productDoc.get("productcategoryid")));
-			product.setInventoryId(Long.parseLong(productDoc.get("productinventoryid")));
-		}
-		
-		return product;
 	}
 
 }

@@ -32,20 +32,24 @@ public class CategoryController {
 	@Resource
 	CategoryService categorySvc;
 	
+	/**
+	 * @description 카테고리 등록
+	 * @params category: 카테고리 정보 (categoryName)
+	 */
 	@RequestMapping(value = "/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "카테고리 등록", notes = "상품 카테고리 등록을 위한 API.")
+	@ApiOperation(value = "카테고리 등록", notes = "카테고리 등록을 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Category.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> categoryWrite (@Parameter(name = "상품 카테고리 등록", description = "", required = true) @RequestBody Category category) {
+	public ResponseEntity<?> categoryWrite (@Parameter(name = "카테고리 정보", required = true) @RequestBody Category category) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
 		Category resCategory = new Category();
 		try {
 			if (categorySvc.categoryWrite(category)) {
-				resCategory = categorySvc.categorySearch(category.getCategoryName());
+				resCategory = categorySvc.categorySearch("categoryname", category.getCategoryName());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -54,18 +58,22 @@ public class CategoryController {
 		return new ResponseEntity<Category>(resCategory, header, HttpStatus.valueOf(200));
 	}
 	
+	/**
+	 * @description 카테고리 검색
+	 * @params categoryName: 검색 키워드
+	 */
 	@RequestMapping(value = "/inquiry/{categoryName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "카테고리 검색", notes = "카테고리명으로 상품 카테고리를 검색하는 API.")
+	@ApiOperation(value = "카테고리 검색", notes = "카테고리명으로 카테고리 정보를 검색하는 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Category.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> categorySearch (@PathVariable String categoryName) {
+	public ResponseEntity<?> categorySearch (@Parameter(name = "카테고리명", required = true) @PathVariable String categoryName) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
 		try {
-			Category category = categorySvc.categorySearch(categoryName);
+			Category category = categorySvc.categorySearch("categoryname", categoryName);
 			return new ResponseEntity<Category>(category, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);

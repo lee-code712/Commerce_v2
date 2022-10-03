@@ -30,7 +30,7 @@ public class ShoppingCartService {
 			}
 			
 			// 중복이 아니면 수량 초과 여부 확인
-			Inventory inventory = inventorySvc.inventorySearchByProductId(cartItem.getProductId());
+			Inventory inventory = inventorySvc.inventorySearchByProduct("productid", "" + cartItem.getProductId());
 			if (inventory.getQuantity() - cartItem.getPurchaseNumber() < 0) {
 				throw new Exception("상품의 재고 수량(" + inventory.getQuantity() + "개)을 초과합니다.");
 			}

@@ -58,10 +58,10 @@ public class PurchaseController {
 		List<Purchase> resPurchaseList = new ArrayList<Purchase>();
 		try {
 			purchase.setPersonId(Long.valueOf(token));	// 토큰에서 사용자 id를 가져와 set
-			purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));	// 현재 날짜 구해서 set
+			purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd HHmmss")));	// 현재 날짜 구해서 set
 			
 			if (purchaseSvc.purchaseWrite(purchase)) {
-				resPurchaseList = purchaseSvc.purchaseSearch(purchase.getPurchaseDate());
+				resPurchaseList = purchaseSvc.purchaseSearch("purchasedate", purchase.getPurchaseDate());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -88,10 +88,10 @@ public class PurchaseController {
 			
 			if (cartItemStringList != null) {	
 				purchase.setPersonId(Long.valueOf(token));	// 토큰에서 사용자 id를 가져와 set
-				purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));	// 현재 날짜 구해서 set
+				purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd HHmmss")));	// 현재 날짜 구해서 set
 				
 				if (purchaseSvc.purchaseWithCartWrite(cartItemStringList, purchase)) {
-					resPurchaseList = purchaseSvc.purchaseSearch(purchase.getPurchaseDate());
+					resPurchaseList = purchaseSvc.purchaseSearch("purchasedate", purchase.getPurchaseDate());
 					// 장바구니 삭제
 					deleteCookie("cart", response);
 				}
@@ -115,7 +115,7 @@ public class PurchaseController {
 		ErrorMsg errors = new ErrorMsg();
 		
 		try {
-			List<PurchaseDetail> purchaseList = purchaseSvc.purchaseDetailSearch(purchaseDate);
+			List<PurchaseDetail> purchaseList = purchaseSvc.purchaseDetailSearch("purchasedate", purchaseDate);
 			return new ResponseEntity<List<PurchaseDetail>>(purchaseList, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
