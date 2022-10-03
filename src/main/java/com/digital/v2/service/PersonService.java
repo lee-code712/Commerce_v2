@@ -3,6 +3,7 @@ package com.digital.v2.service;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.Term;
 import org.springframework.stereotype.Component;
 
 import com.digital.v2.schema.Address;
@@ -10,8 +11,10 @@ import com.digital.v2.schema.Person;
 import com.digital.v2.schema.Phone;
 
 import static com.digital.v2.lucene.DataHandler.findHardly;
+import static com.digital.v2.lucene.DataHandler.findHardlyByTwoTerms;
 import static com.digital.v2.lucene.DataHandler.findListHardly;
 import static com.digital.v2.lucene.DataHandler.write;
+import static com.digital.v2.lucene.DataHandler.deleteByTwoTerms;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,16 +33,16 @@ public class PersonService {
 		
 		try {
 			// person 중복 여부 확인
-			if (personSearch(person.getPersonName()).getPersonName() != null) {
-				throw new Exception("이미 가입된 회원정보입니다.");
+			if (personSearch("personname", person.getPersonName()).getPersonName() != null) {
+				throw new Exception("이미 가입된 회원 정보입니다.");
 			}
 
 			// 중복이 아니면 write
 			person.setPersonId(System.currentTimeMillis());
 			List<Document> docList = setPluralDoc(person);
 
-			for (Document document : docList) {
-				write(document);
+			for (Document doc : docList) {
+				write(doc);
 			}		
 			return true;
 		} catch (Exception e) {
@@ -49,7 +52,7 @@ public class PersonService {
 	
 	public Person login (Person person) throws Exception {
 		
-		Person findPerson = personSearch(person.getPersonName());
+		Person findPerson = personSearch("personname", person.getPersonName());
 		
 		if (findPerson.getPersonName() == null) {
 			return null;
@@ -61,10 +64,18 @@ public class PersonService {
 		return findPerson;
 	}
 	
-	public Person personSearch (String personName) throws Exception {
+	public boolean isValidPerson (String token) throws Exception {
 		
-		String key = "personname";
-		String value = personName;
+		String key = "personid";
+		String value = token;
+		
+		Document personDoc = findHardly(key, value);
+		
+		if (personDoc != null) return true;
+		return false;
+	}
+	
+	public Person personSearch (String key, String value) throws Exception {
 		
 		Document personDoc = findHardly(key, value);
 		
@@ -78,7 +89,7 @@ public class PersonService {
 			person.setGender(personDoc.get("gender"));
 			
 			// address list set
-			List<Document> partyAddressDocList = getPartyAddress(person);
+			List<Document> partyAddressDocList = getPartyAddressDocList(person);
 			
 			List<Address> addressList = new ArrayList<Address>();
 			for (Document partyAddressDoc : partyAddressDocList) {
@@ -89,7 +100,7 @@ public class PersonService {
 			person.setAddressList(addressList);
 			
 			// phone list set
-			List<Document> partyPhoneDocList = getPartyPhone(person);
+			List<Document> partyPhoneDocList = getPartyPhoneDocList(person);
 			
 			List<Phone> phoneList = new ArrayList<Phone>();
 			for (Document partyPhoneDoc : partyPhoneDocList) {
@@ -103,7 +114,7 @@ public class PersonService {
 		return person;
 	}
 	
-	public List<Document> setPluralDoc(Person person) {
+	public List<Document> setPluralDoc (Person person) {
 
 		List<Document> docList = new ArrayList<Document>();
 		
@@ -122,11 +133,11 @@ public class PersonService {
 		for (Address address : addressList) {
 			try {
 				if (addressSvc.addressWrite(address)) {
-					docList.add(setPartyAddress(person, addressSvc.addressSearch(address.getAddressDetail())));
+					docList.add(setPartyAddressDoc(person, addressSvc.addressSearch(address.getAddressDetail())));
 				}
 			} catch (Exception e) {
 				try {
-					docList.add(setPartyAddress(person, addressSvc.addressSearch(address.getAddressDetail())));
+					docList.add(setPartyAddressDoc(person, addressSvc.addressSearch(address.getAddressDetail())));
 				} catch (Exception e1) {}
 			}
 		}
@@ -136,11 +147,11 @@ public class PersonService {
 		for (Phone phone : phoneList) {
 			try {
 				if (phoneSvc.phoneWrite(phone)) {
-					docList.add(setPartyPhone(person, phoneSvc.phoneSearch(phone.getPhoneNumber())));
+					docList.add(setPartyPhoneDoc(person, phoneSvc.phoneSearch(phone.getPhoneNumber())));
 				}
 			} catch (Exception e) {
 				try {
-					docList.add(setPartyPhone(person, phoneSvc.phoneSearch(phone.getPhoneNumber())));
+					docList.add(setPartyPhoneDoc(person, phoneSvc.phoneSearch(phone.getPhoneNumber())));
 				} catch (Exception e1) {}
 			}
 		}
@@ -148,38 +159,136 @@ public class PersonService {
 		return docList;
 	}
 	
-	public Document setPartyAddress(Person person, Address address) {
+	public Document setPartyAddressDoc (Person person, Address address) {
 
-		Document doc = new Document();
+		Document partyAddressDoc = new Document();
 
-		doc.add(new TextField("partyaddressid", "" + address.getAddressId(), Store.YES));
-		doc.add(new TextField("partyaddresspersonid", "" + person.getPersonId(), Store.YES));
+		partyAddressDoc.add(new TextField("partyaddressid", "" + address.getAddressId(), Store.YES));
+		partyAddressDoc.add(new TextField("partyaddresspersonid", "" + person.getPersonId(), Store.YES));
 
-		return doc;
+		return partyAddressDoc;
 	}
 	
-	public List<Document> getPartyAddress(Person person) {
-
-		List<Document> docList = findListHardly("partyaddresspersonid", "" + person.getPersonId());
+	public Document getPartyAddressDoc (long personId, long addressId) {
 		
-		return docList;
-	}
-	
-	public Document setPartyPhone(Person person, Phone phone) {
-
-		Document doc = new Document();
-
-		doc.add(new TextField("partyphoneid", "" + phone.getPhoneId(), Store.YES));
-		doc.add(new TextField("partyphonepersonid", "" + person.getPersonId(), Store.YES));
-
+		Term term1 = new Term("partyaddressid", "" + addressId);
+		Term term2 = new Term("partyaddresspersonid", "" + personId);
+		Document doc = findHardlyByTwoTerms(term1, term2);
+		
 		return doc;
 	}
 	
-	public List<Document> getPartyPhone(Person person) {
+	public List<Document> getPartyAddressDocList (Person person) {
 
-		List<Document> docList = findListHardly("partyphonepersonid", "" + person.getPersonId());
-
-		return docList;
+		List<Document> partyAddressDocList = findListHardly("partyaddresspersonid", "" + person.getPersonId());
+		
+		return partyAddressDocList;
 	}
+	
+	public Document setPartyPhoneDoc (Person person, Phone phone) {
 
+		Document partyPhoneDoc = new Document();
+
+		partyPhoneDoc.add(new TextField("partyphoneid", "" + phone.getPhoneId(), Store.YES));
+		partyPhoneDoc.add(new TextField("partyphonepersonid", "" + person.getPersonId(), Store.YES));
+
+		return partyPhoneDoc;
+	}
+	
+	public Document getPartyPhoneDoc (long personId, long phoneId) {
+		
+		Term term1 = new Term("partyphoneid", "" + phoneId);
+		Term term2 = new Term("partyphonepersonid", "" + personId);
+		Document doc = findHardlyByTwoTerms(term1, term2);
+		
+		return doc;
+	}
+	
+	public List<Document> getPartyPhoneDocList (Person person) {
+
+		List<Document> partyPhoneDocList = findListHardly("partyphonepersonid", "" + person.getPersonId());
+
+		return partyPhoneDocList;
+	}
+	
+	public boolean partyAddressWrite (long personId, long addressId) throws Exception {
+
+		try {
+			// party address 중복 여부 확인
+			if (getPartyAddressDoc(personId, addressId) != null) {
+				throw new Exception("회원 정보에 이미 등록된 주소입니다."); 
+			} 
+	
+			// 중복이 아니면 write
+			Document doc = new Document();
+
+			doc.add(new TextField("partyaddressid", "" + addressId, Store.YES));
+			doc.add(new TextField("partyaddresspersonid", "" + personId, Store.YES));
+			
+			write(doc);
+			return true;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
+	public boolean partyAddressDelete (long personId, long addressId) throws Exception {
+		
+		try {
+			// party address 존재 여부 확인
+			if (getPartyAddressDoc(personId, addressId) == null) {
+				throw new Exception("회원정보에 해당 주소가 없습니다."); 
+			} 
+	
+			// 존재하면 delete
+			Term term1 = new Term("partyaddressid", "" + addressId);
+			Term term2 = new Term("partyaddresspersonid", "" + personId);
+			
+			deleteByTwoTerms(term1, term2);
+			return true;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
+	public boolean partyPhoneWrite (long personId, long phoneId) throws Exception {
+
+		try {
+			// party address 중복 여부 확인
+			if (getPartyPhoneDoc(personId, phoneId) != null) {
+				throw new Exception("회원정보에 이미 등록된 전화번호입니다."); 
+			} 
+	
+			// 중복이 아니면 write
+			Document doc = new Document();
+
+			doc.add(new TextField("partyphoneid", "" + phoneId, Store.YES));
+			doc.add(new TextField("partyphonepersonid", "" + personId, Store.YES));
+			
+			write(doc);
+			return true;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
+	public boolean partyPhoneDelete (long personId, long phoneId) throws Exception {
+		
+		try {
+			// party phone 존재 여부 확인
+			if (getPartyPhoneDoc(personId, phoneId) == null) {
+				throw new Exception("회원정보에 해당 전화번호가 없습니다."); 
+			} 
+	
+			// 존재하면 delete
+			Term term1 = new Term("partyphoneid", "" + phoneId);
+			Term term2 = new Term("partyphonepersonid", "" + personId);
+			
+			deleteByTwoTerms(term1, term2);
+			return true;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
 }

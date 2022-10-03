@@ -11,7 +11,7 @@ public class Phone {
 	@ApiModelProperty(required = false, position = 1, notes = "전화번호 ID", example = "0", dataType = "long")
 	private long phoneId;
 	
-	@ApiModelProperty(required = true, position = 2, notes = "전화번호 상세", example = "010-1111-1111", dataType = "string")
+	@ApiModelProperty(required = true, position = 2, notes = "전화번호 상세", example = "xxx-xxxx-xxxx", dataType = "string")
 	private String phoneNumber;
 	
 	public long getPhoneId() {

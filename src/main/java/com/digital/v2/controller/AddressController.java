@@ -36,7 +36,7 @@ public class AddressController {
 	@RequestMapping(value = "/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "주소 등록", notes = "주소를 등록하기 위한 API.")
 	@ApiResponses({
-		@ApiResponse(code = 200, message = "성공", response = SuccessMsg.class),
+		@ApiResponse(code = 200, message = "성공", response = Address.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
 	public ResponseEntity<?> addressWrite (@Parameter(name = "주소 등록", description = "", required = true) @RequestBody Address address) {

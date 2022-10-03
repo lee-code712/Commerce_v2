@@ -21,7 +21,7 @@ public class Purchase {
 	@ApiModelProperty(required = true, position = 5, notes = "전화번호 ID", example = "0", dataType = "long")
 	private long phoneId;
 	
-	@ApiModelProperty(required = true, position = 6, notes = "구매 날짜", example = "0", dataType = "string")
+	@ApiModelProperty(required = true, position = 6, notes = "구매 날짜", example = "yyyyMMdd HHmmss", dataType = "string")
 	private String purchaseDate;
 
 	public long getPersonId() {

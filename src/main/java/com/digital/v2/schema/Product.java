@@ -15,7 +15,7 @@ public class Product {
 	@ApiModelProperty(required = false, position = 3, notes = "상품 재고 ID", example = "0", dataType = "long")
 	private long inventoryId;
 	
-	@ApiModelProperty(required = true, position = 4, notes = "상품 가격", example = "1000", dataType = "long")
+	@ApiModelProperty(required = true, position = 4, notes = "상품 가격", example = "0", dataType = "long")
 	private long price;
 	
 	@ApiModelProperty(required = true, position = 5, notes = "상품명", example = "상품명", dataType = "string")
