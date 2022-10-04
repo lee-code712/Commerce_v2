@@ -31,6 +31,7 @@ public class Product {
 	}
 	
 	public long getCategoryId() {
+		long categoryId = this.categoryId;
 		return categoryId;
 	}
 
@@ -39,6 +40,7 @@ public class Product {
 	}
 	
 	public long getInventoryId() {
+		long inventoryId = this.inventoryId;
 		return inventoryId;
 	}
 
@@ -64,18 +66,4 @@ public class Product {
 		this.productName = productName;
 	}
 	
-//	public static void main(String[] args) throws Exception {
-//		Class<?> cl = Class.forName("com.digital.schema.Product");
-//
-//		Method[] methods = cl.getMethods();
-//		int fieldLength = cl.getDeclaredFields().length;
-//		int cnt = 0;
-//		
-//		for (Method method : methods) {
-//			if (method.getName().startsWith("set") && fieldLength > cnt) {
-//				System.out.println(method.getName());
-//				cnt++;
-//			}
-//		}
-//	}
 }

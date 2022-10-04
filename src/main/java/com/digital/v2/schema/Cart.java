@@ -12,6 +12,7 @@ public class Cart {
 	private List<CartProduct> cart;
 
 	public List<CartProduct> getCart() {
+		List<CartProduct> cart = this.cart;
 		return cart;
 	}
 

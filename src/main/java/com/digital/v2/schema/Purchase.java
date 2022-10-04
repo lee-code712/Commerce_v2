@@ -1,9 +1,9 @@
 package com.digital.v2.schema;
 
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 
-@ApiModel
+@ArraySchema
 public class Purchase {
 
 	@ApiModelProperty(required = false, position = 1, notes = "회원 ID", example = "0", dataType = "long")

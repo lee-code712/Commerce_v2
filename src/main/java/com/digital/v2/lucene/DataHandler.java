@@ -93,7 +93,7 @@ public class DataHandler {	// lucene 레퍼지토리 정보
 		return true;
 	}
 	
-	public static boolean deleteByTwoTerms(Term term1, Term term2) throws Exception {
+	public static boolean delete(Term term1, Term term2) throws Exception {
 
 		try {
 			IndexWriterConfig config = new IndexWriterConfig(new StandardAnalyzer());
@@ -156,7 +156,6 @@ public class DataHandler {	// lucene 레퍼지토리 정보
 			for (ScoreDoc sd : foundDocsBody.scoreDocs) {
 				doc = searcher.doc(sd.doc);
 				docList.add(doc);
-//				System.out.println(doc.getFields());
 			}
 			
 		} catch (Exception e) {
@@ -166,7 +165,7 @@ public class DataHandler {	// lucene 레퍼지토리 정보
 		return docList;
 	}
 	
-	public static List<Document> findListHardlyByTwoTerms(Term term1, Term term2) {
+	public static List<Document> findListHardly(Term term1, Term term2) {
 		
 		List<Document> docList = new ArrayList<Document>();
 		Document doc = null;
@@ -189,7 +188,6 @@ public class DataHandler {	// lucene 레퍼지토리 정보
 			for (ScoreDoc sd : foundDocsBody.scoreDocs) {
 				doc = searcher.doc(sd.doc);
 				docList.add(doc);
-//				System.out.println(doc.getFields());
 			}
 			
 		} catch (Exception e) {
@@ -212,7 +210,6 @@ public class DataHandler {	// lucene 레퍼지토리 정보
 			TopDocs foundDocsBody = searcher.search(wordQuery, 1000);
 			for (ScoreDoc sd : foundDocsBody.scoreDocs) {
 				doc = searcher.doc(sd.doc);				
-//				System.out.println(doc.getFields());
 				return doc;
 			}
 		} catch (Exception e) {
@@ -222,7 +219,7 @@ public class DataHandler {	// lucene 레퍼지토리 정보
 		return null;
 	}
 	
-	public static Document findHardlyByTwoTerms(Term term1, Term term2) {
+	public static Document findHardly(Term term1, Term term2) {
 		
 		Document doc = null;
 		
@@ -241,7 +238,6 @@ public class DataHandler {	// lucene 레퍼지토리 정보
 			TopDocs foundDocsBody = searcher.search(wordQuery, 1000);
 			for (ScoreDoc sd : foundDocsBody.scoreDocs) {
 				doc = searcher.doc(sd.doc);				
-//				System.out.println(doc.getFields());
 				return doc;
 			}
 		} catch (Exception e) {

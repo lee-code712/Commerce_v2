@@ -11,7 +11,7 @@ public class Address {
 	@ApiModelProperty(required = false, position = 1, notes = "주소 ID", example = "0", dataType = "long")
 	private long addressId;
 	
-	@ApiModelProperty(required = true, position = 2, notes = "주소 상세", example = "00시 00구 00로", dataType = "string")
+	@ApiModelProperty(required = true, position = 2, notes = "주소 상세", example = "xx시 xx구", dataType = "string")
 	private String addressDetail;
 
 	public long getAddressId() {

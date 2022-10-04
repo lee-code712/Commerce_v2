@@ -13,6 +13,7 @@ import com.digital.v2.schema.Category;
 @Component
 public class CategoryService {
 	
+	/* 카테고리 등록 서비스 */
 	public boolean categoryWrite (Category category) throws Exception {
 		
 		try {
@@ -35,6 +36,7 @@ public class CategoryService {
 		}
 	}
 	
+	/* 카테고리 검색 서비스 */
 	public Category categorySearch (String key, String value) throws Exception {
 		
 		Document categoryDoc = findHardly(key, value);

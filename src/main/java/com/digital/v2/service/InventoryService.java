@@ -21,6 +21,7 @@ public class InventoryService {
 	@Resource
 	ProductService productSvc;
 
+	/* 재고 등록 서비스 - 재고가 등록되어 있는 경우 재고 변경 서비스 호출 */
 	public boolean inventoryWrite (Inventory inventory) throws Exception {
 		
 		try {
@@ -44,6 +45,24 @@ public class InventoryService {
 		}
 	}
 	
+	/* 재고 변경 서비스 */
+	public boolean inventoryUpdate (Inventory inventory) throws Exception {
+		
+		try {
+			Term updateTerm = new Term("inventoryid", "" + inventory.getInventoryId());
+			Document newDoc = new Document();
+			
+			newDoc.add(new TextField("inventoryid", "" + inventory.getInventoryId(), Store.YES));
+			newDoc.add(new TextField("quantity", "" + inventory.getQuantity(), Store.YES));
+			
+			update(newDoc, updateTerm);
+			return true;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
+	/* 재고 검색 서비스 */
 	public Inventory inventorySearch (String key, String value) throws Exception {
 		
 		Document doc = findHardly(key, value);
@@ -57,6 +76,7 @@ public class InventoryService {
 		return inventory;
 	}
 	
+	/* 상품 정보를 이용한 재고 검색 서비스 */
 	public Inventory inventorySearchByProduct (String productKey, String productValue) throws Exception {
 		
 		String key = "inventoryid";
@@ -78,21 +98,15 @@ public class InventoryService {
 		
 		return inventory;
 	}
-	
-	public boolean inventoryUpdate (Inventory inventory) throws Exception {
+
+	/* 상품에 대한 입력 수량 유효성 검증 */
+	public boolean inventoryQuantityCheck (long productId, long quantity) throws Exception {
 		
-		try {
-			Term updateTerm = new Term("inventoryid", "" + inventory.getInventoryId());
-			Document newDoc = new Document();
-			
-			newDoc.add(new TextField("inventoryid", "" + inventory.getInventoryId(), Store.YES));
-			newDoc.add(new TextField("quantity", "" + inventory.getQuantity(), Store.YES));
-			
-			update(newDoc, updateTerm);
-			return true;
-		} catch (Exception e) {
-			throw e;
+		Inventory inventory = inventorySearchByProduct("productid", "" + productId);
+		
+		if (inventory.getQuantity() - quantity < 0) {
+			return false;
 		}
+		return true;
 	}
-	
 }

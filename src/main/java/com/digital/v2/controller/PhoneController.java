@@ -32,10 +32,6 @@ public class PhoneController {
 	@Resource
 	private PhoneService phoneSvc;
 	
-	/**
-	 * @description 전화번호 등록
-	 * @params phone: 전화번호 정보 (phoneNumber)
-	 */
 	@RequestMapping(value = "/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "전화번호 등록", notes = "전화번호를 등록하기 위한 API.")
 	@ApiResponses({
@@ -58,10 +54,6 @@ public class PhoneController {
 		return new ResponseEntity<Phone>(resPhone, header, HttpStatus.valueOf(200));
 	}
 
-	/**
-	 * @description 전화번호 검색
-	 * @params phoneNumber: 검색 키워드
-	 */
 	@RequestMapping(value = "/inquiry/{phoneNumber}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "전화번호 검색", notes = "전화번호 상세로 전화번호 정보를 검색하기 위한 API.")
 	@ApiResponses({

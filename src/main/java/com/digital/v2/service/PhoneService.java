@@ -13,6 +13,7 @@ import com.digital.v2.schema.Phone;
 @Component
 public class PhoneService {
 	
+	/* 전화번호 등록 서비스 */
 	public boolean phoneWrite (Phone phone) throws Exception {
 
 		try {
@@ -35,6 +36,7 @@ public class PhoneService {
 		}
 	}
 	
+	/* 전화번호 검색 서비스 */
 	public Phone phoneSearch (String key, String value) throws Exception {
 		
 		Document phoneDoc = findHardly(key, value);

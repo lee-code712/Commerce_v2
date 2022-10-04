@@ -39,10 +39,6 @@ public class PersonController {
 	@Resource
 	private PersonService personSvc;
 	
-	/**
-	 * @description 회원가입
-	 * @params person: 회원가입 정보 (personName, password, gender, phoneNumber(s), addressDetail(s))
-	 */
 	@RequestMapping(value = "/signUp", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "회원가입", notes = "회원가입을 위한 API.")
 	@ApiResponses({
@@ -65,17 +61,13 @@ public class PersonController {
 		return new ResponseEntity<Person>(resPerson, header, HttpStatus.valueOf(200));
 	}
 	
-	/**
-	 * @description 로그인
-	 * @params person: 회원 계정 정보 (personName, password)
-	 */
 	@RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "로그인", notes = "로그인을 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = SuccessMsg.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> login (@Parameter(name = "회원 계정 정보", required = true) @RequestBody Person person) {
+	public ResponseEntity<?> login (@Parameter(name = "계정 정보", required = true) @RequestBody Person person) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		SuccessMsg success = new SuccessMsg();
@@ -94,10 +86,6 @@ public class PersonController {
 		return new ResponseEntity<SuccessMsg>(success, header, HttpStatus.valueOf(200));
 	}
 	
-	/**
-	 * @description 로그아웃
-	 * @params response: 삭제하는 쿠키정보를 저장할 response 객체
-	 */
 	@RequestMapping(value = "/logout", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "로그아웃", notes = "로그아웃을 위한 API.")
 	@ApiResponses({
@@ -110,7 +98,10 @@ public class PersonController {
 		SuccessMsg success = new SuccessMsg();
 		
 		try {
-			deleteCookie("cart", response);	// 장바구니 관련 cookie 삭제
+			// cart cookie 삭제
+			deleteCookie("cart", response);
+			
+			// authorize token 헤더에서 삭제
 			
 			success.setSuccessCode(200);
 			success.setSuccessMsg("로그아웃 되었습니다.");
@@ -121,12 +112,8 @@ public class PersonController {
 		return new ResponseEntity<SuccessMsg>(success, header, HttpStatus.valueOf(200));
 	}
 	
-	/**
-	 * @description 회원 본인 검색
-	 * @params personName: 검색 키워드, request: personId token 값을 가져오기 위한 request 객체
-	 */
 	@RequestMapping(value = "/inquiry/{personName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "회원 본인 검색", notes = "회원명으로 회원 본인 정보를 검색하기 위한 API.")
+	@ApiOperation(value = "회원 본인 검색", notes = "회원명으로 본인 정보를 검색하기 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
@@ -138,9 +125,11 @@ public class PersonController {
 		String token = request.getHeader("Authorization");
 		
 		try {
-			Person person = personSvc.personSearch("personname", personName);
+			Person person = personSvc.personSearch("personname", personName);	
+			
+			// 검색해 온 person 객체가 회원의 정보인지 확인
 			if (person.getPersonId() != Long.valueOf(token)) {
-				return ExceptionUtils.setException(errors, 401, "유효하지 않은 token 사용으로 접근할 수 없습니다.", header);
+				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
 			}
 			return new ResponseEntity<Person>(person, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
@@ -148,10 +137,6 @@ public class PersonController {
 		}
 	}
 	
-	/**
-	 * @description 회원 주소 추가
-	 * @params address: 주소 정보 (addressId), request: personId token 값을 가져오기 위한 request 객체
-	 */
 	@RequestMapping(value = "/partyAddress/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "회원 주소 추가", notes = "회원의 주소 정보를 추가로 등록하기 위한 API.")
 	@ApiResponses({
@@ -166,8 +151,9 @@ public class PersonController {
 
 		Person person = new Person();
 		try {
+			// 유효한 token(personId)인지 확인
 			if (!personSvc.isValidPerson(token)) {
-				return ExceptionUtils.setException(errors, 401, "유효하지 않은 token 사용으로 접근할 수 없습니다.", header);
+				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
 			}
 			
 			if (personSvc.partyAddressWrite(Long.valueOf(token), address.getAddressId())) {
@@ -180,12 +166,8 @@ public class PersonController {
 		return new ResponseEntity<Person>(person, header, HttpStatus.valueOf(200));
 	}
 	
-	/**
-	 * @description 회원 주소 삭제
-	 * @params address: 주소 (addressId), request: personId token 값을 가져오기 위한 request 객체
-	 */
 	@RequestMapping(value = "/partyAddress/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "회원 주소 삭제", notes = "회원의 주소 정보를 삭제하기 위한 API.")
+	@ApiOperation(value = "회원 주소 삭제", notes = "회원의 특정 주소 정보를 삭제하기 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
@@ -198,8 +180,9 @@ public class PersonController {
 
 		Person person = new Person();
 		try {
+			// 유효한 token(personId)인지 확인
 			if (!personSvc.isValidPerson(token)) {
-				return ExceptionUtils.setException(errors, 401, "유효하지 않은 token 사용으로 접근할 수 없습니다.", header);
+				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
 			}
 			
 			if (personSvc.partyAddressDelete(Long.valueOf(token), address.getAddressId())) {
@@ -212,10 +195,6 @@ public class PersonController {
 		return new ResponseEntity<Person>(person, header, HttpStatus.valueOf(200));
 	}
 
-	/**
-	 * @description 회원 전화번호 추가
-	 * @params phone: 전화번호 정보 (phoneId), request: personId token 값을 가져오기 위한 request 객체
-	 */
 	@RequestMapping(value = "/partyPhone/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "회원 전화번호 추가", notes = "회원의 전화번호 정보를 추가로 등록하기 위한 API.")
 	@ApiResponses({
@@ -230,8 +209,9 @@ public class PersonController {
 
 		Person person = new Person();
 		try {
+			// 유효한 token(personId)인지 확인
 			if (!personSvc.isValidPerson(token)) {
-				return ExceptionUtils.setException(errors, 401, "유효하지 않은 token 사용으로 접근할 수 없습니다.", header);
+				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
 			}
 			
 			if (personSvc.partyPhoneWrite(Long.valueOf(token), phone.getPhoneId())) {
@@ -244,12 +224,8 @@ public class PersonController {
 		return new ResponseEntity<Person>(person, header, HttpStatus.valueOf(200));
 	}
 	
-	/**
-	 * @description 회원 전화번호 삭제
-	 * @params phone: 전화번호 정보 (phoneId), request: personId token 값을 가져오기 위한 request 객체
-	 */
 	@RequestMapping(value = "/partyPhone/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "회원 전화번호 삭제", notes = "회원의 전화번호 정보를 삭제하기 위한 API.")
+	@ApiOperation(value = "회원 전화번호 삭제", notes = "회원의 특정 전화번호 정보를 삭제하기 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
@@ -262,8 +238,9 @@ public class PersonController {
 
 		Person person = new Person();
 		try {
+			// 유효한 token(personId)인지 확인
 			if (!personSvc.isValidPerson(token)) {
-				return ExceptionUtils.setException(errors, 401, "유효하지 않은 token 사용으로 접근할 수 없습니다.", header);
+				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
 			}
 			
 			if (personSvc.partyPhoneDelete(Long.valueOf(token), phone.getPhoneId())) {
@@ -275,4 +252,5 @@ public class PersonController {
 		
 		return new ResponseEntity<Person>(person, header, HttpStatus.valueOf(200));
 	}
+	
 }

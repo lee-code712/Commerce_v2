@@ -28,8 +28,8 @@ public class SwaggerConfig {
 				.consumes(getConsumeContentTypes()).produces(getProduceContentTypes()).select()
 				.apis(RequestHandlerSelectors.any()).paths(PathSelectors.ant("/rest/**")) // 그 중 /rest/** 인 URL들만 필터링
 				.build()
-				.securityContexts(Arrays.asList(securityContext()))	// 설정 추가
-				.securitySchemes(Arrays.asList(apiKey()));	// 설정 추가
+				.securityContexts(Arrays.asList(securityContext()))
+				.securitySchemes(Arrays.asList(apiKey()));	// 액세스 권한이 있는지에 대한 인가 처리방법 설정 - ApiKey 사용
 	}
 	
 	private Set<String> getConsumeContentTypes() {
@@ -44,12 +44,12 @@ public class SwaggerConfig {
 		return produces;
 	}
 	
-	// swagger에서 jwt 토큰값 넣기위한 설정 -> JWT를 인증 헤더로 포함하도록 ApiKey를 정의.
+	// 인증 헤더에 들어갈 ApiKey 생성
 	private ApiKey apiKey() {
         return new ApiKey("JWT", "Authorization", "header");
     }
 	
-    // 전역 AuthorizationScope를 사용하여 JWT SecurityContext를 구성.
+    // ApiKey를 보관할 SecurityContext 구성
     private SecurityContext securityContext() {
         return SecurityContext.builder()
                 .securityReferences(defaultAuth())

@@ -32,10 +32,6 @@ public class AddressController {
 	@Resource
 	private AddressService addressSvc;
 	
-	/**
-	 * @description 주소 등록
-	 * @params address: 주소 정보 (addressDetail)
-	 */
 	@RequestMapping(value = "/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "주소 등록", notes = "주소 정보를 등록하기 위한 API.")
 	@ApiResponses({
@@ -58,10 +54,6 @@ public class AddressController {
 		return new ResponseEntity<Address>(resAddress, header, HttpStatus.valueOf(200));
 	}
 	
-	/**
-	 * @description 주소 검색
-	 * @params addressDetail: 검색 키워드
-	 */
 	@RequestMapping(value = "/inquiry/{addressDetail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "주소 검색", notes = "주소 상세로 주소 정보를 검색하기 위한 API.")
 	@ApiResponses({

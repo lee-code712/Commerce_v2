@@ -33,10 +33,6 @@ public class ProductController {
 	@Resource
 	ProductService productSvc;
 	
-	/**
-	 * @description 상품 등록
-	 * @params product: 상품 정보 (categoryId, price, productName)
-	 */
 	@RequestMapping(value = "/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "상품 등록", notes = "상품 등록을 위한 API.")
 	@ApiResponses({
@@ -59,17 +55,13 @@ public class ProductController {
 		return new ResponseEntity<Product>(resProduct, header, HttpStatus.valueOf(200));
 	}
 
-	/**
-	 * @description 상품 검색
-	 * @params keyword: 검색 키워드
-	 */
 	@RequestMapping(value = "/inquiry/{keyword}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "상품명 키워드 검색", notes = "특정 단어를 포함하는 상품명으로 상품 목록을 검색하는 API.")
+	@ApiOperation(value = "상품 검색", notes = "키워드를 포함하는 상품명으로 상품 목록을 검색하는 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = ProductList.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> productSearchBykeyword (@Parameter(name = "키워드", required = true) @PathVariable String keyword) {
+	public ResponseEntity<?> productSearchBykeyword (@Parameter(name = "상품명 키워드", required = true) @PathVariable String keyword) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
@@ -81,10 +73,6 @@ public class ProductController {
 		}
 	}
 	
-	/**
-	 * @description 카테고리별 상품 검색
-	 * @params categoryName: 검색 키워드
-	 */
 	@RequestMapping(value = "/inquiry/byCategory/{categoryName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "카테고리별 상품 검색", notes = "특정 카테고리의 상품 목록을 검색하는 API.")
 	@ApiResponses({

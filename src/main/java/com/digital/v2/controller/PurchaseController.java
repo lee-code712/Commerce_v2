@@ -71,7 +71,7 @@ public class PurchaseController {
 			purchase.setPersonId(Long.valueOf(token));	// 토큰에서 사용자 id를 가져와 set
 			purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd HHmmss")));	// 현재 날짜 구해서 set
 			
-			if (purchaseSvc.purchaseWrite(purchase)) {
+			if (purchaseSvc.purchase(purchase)) {
 				resPurchases = purchaseSvc.purchaseSearch(token, "purchasedate", purchase.getPurchaseDate());
 			}
 		} catch (Exception e) {
@@ -105,7 +105,7 @@ public class PurchaseController {
 				purchase.setPersonId(Long.valueOf(token));	// 토큰에서 사용자 id를 가져와 set
 				purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd HH:mm:ss")));	// 현재 날짜 구해서 set
 				
-				if (purchaseSvc.purchaseWithCartWrite(cartValueList, purchase)) {
+				if (purchaseSvc.purchaseInCart(cartValueList, purchase)) {
 					resPurchases = purchaseSvc.purchaseSearch(token, "purchasedate", purchase.getPurchaseDate());
 					// 장바구니 삭제
 					deleteCookie("cart", response);

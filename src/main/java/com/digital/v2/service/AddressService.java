@@ -14,6 +14,7 @@ import com.digital.v2.schema.Address;
 @Component
 public class AddressService {
 
+	/* 주소 등록 서비스 */
 	public boolean addressWrite (Address address) throws Exception {
 
 		try {
@@ -36,6 +37,7 @@ public class AddressService {
 		}
 	}
 	
+	/* 주소 검색 서비스 */
 	public Address addressSearch (String key, String value) throws Exception {
 		
 		Document addressDoc = findHardly(key, value);

@@ -31,11 +31,7 @@ public class CategoryController {
 
 	@Resource
 	CategoryService categorySvc;
-	
-	/**
-	 * @description 카테고리 등록
-	 * @params category: 카테고리 정보 (categoryName)
-	 */
+
 	@RequestMapping(value = "/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "카테고리 등록", notes = "카테고리 등록을 위한 API.")
 	@ApiResponses({
@@ -58,10 +54,6 @@ public class CategoryController {
 		return new ResponseEntity<Category>(resCategory, header, HttpStatus.valueOf(200));
 	}
 	
-	/**
-	 * @description 카테고리 검색
-	 * @params categoryName: 검색 키워드
-	 */
 	@RequestMapping(value = "/inquiry/{categoryName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "카테고리 검색", notes = "카테고리명으로 카테고리 정보를 검색하는 API.")
 	@ApiResponses({

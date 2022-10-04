@@ -32,17 +32,13 @@ public class InventoryController {
 	@Resource
 	InventoryService inventorySvc;
 	
-	/**
-	 * @description 재고 등록
-	 * @params inventory: 재고 정보 (inventoryId, quantity)
-	 */
-	@RequestMapping(value = "/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "재고 등록", notes = "특정 상품의 재고를 등록하기 위한 API.")
+	@RequestMapping(value = "/manage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "재고 관리", notes = "특정 상품의 재고를 관리하기 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Inventory.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> inventoryWrite (@Parameter(name = "재고 정보", required = true) @RequestBody Inventory inventory) {
+	public ResponseEntity<?> inventoryManage (@Parameter(name = "재고 정보", required = true) @RequestBody Inventory inventory) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
@@ -58,10 +54,6 @@ public class InventoryController {
 		return new ResponseEntity<Inventory>(resInventory, header, HttpStatus.valueOf(200));
 	}
 	
-	/**
-	 * @description 재고 검색
-	 * @params productName: 검색 키워드
-	 */
 	@RequestMapping(value = "/inquiry/{productName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "재고 검색", notes = "상품명으로 상품 재고를 검색하는 API.")
 	@ApiResponses({
@@ -79,31 +71,4 @@ public class InventoryController {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
 	}
-	
-	/**
-	 * @description 재고 수량 변경
-	 * @params inventory: 변경한 재고 정보 (inventoryId, quantity)
-	 */
-	@RequestMapping(value = "/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "재고 수량 변경", notes = "특정 상품의 재고 수량을 변경하기 위한 API.")
-	@ApiResponses({
-		@ApiResponse(code = 200, message = "성공", response = Inventory.class),
-		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
-	})
-	public ResponseEntity<?> inventoryUpdate (@Parameter(name = "재고 정보", required = true) @RequestBody Inventory inventory) {
-		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
-		ErrorMsg errors = new ErrorMsg();
-		
-		Inventory resInventory = new Inventory();
-		try {
-			if (inventorySvc.inventoryWrite(inventory)) {
-				resInventory = inventorySvc.inventorySearch("inventoryid", "" + inventory.getInventoryId());
-			}
-		} catch (Exception e) {
-			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
-		}
-
-		return new ResponseEntity<Inventory>(resInventory, header, HttpStatus.valueOf(200));
-	}
-	
 }

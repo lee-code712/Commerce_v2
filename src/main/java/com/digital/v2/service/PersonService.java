@@ -11,10 +11,9 @@ import com.digital.v2.schema.Person;
 import com.digital.v2.schema.Phone;
 
 import static com.digital.v2.lucene.DataHandler.findHardly;
-import static com.digital.v2.lucene.DataHandler.findHardlyByTwoTerms;
 import static com.digital.v2.lucene.DataHandler.findListHardly;
 import static com.digital.v2.lucene.DataHandler.write;
-import static com.digital.v2.lucene.DataHandler.deleteByTwoTerms;
+import static com.digital.v2.lucene.DataHandler.delete;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +28,13 @@ public class PersonService {
 	@Resource
 	PhoneService phoneSvc;
 
+	/* 회원가입 서비스 */
 	public boolean signUp (Person person) throws Exception {
 		
 		try {
 			// person 중복 여부 확인
 			if (personSearch("personname", person.getPersonName()).getPersonName() != null) {
-				throw new Exception("이미 가입된 회원 정보입니다.");
+				throw new Exception("이미 가입한 회원입니다.");
 			}
 
 			// 중복이 아니면 write
@@ -50,6 +50,7 @@ public class PersonService {
 		}
 	}
 	
+	/* 로그인 서비스 */
 	public Person login (Person person) throws Exception {
 		
 		Person findPerson = personSearch("personname", person.getPersonName());
@@ -64,17 +65,7 @@ public class PersonService {
 		return findPerson;
 	}
 	
-	public boolean isValidPerson (String token) throws Exception {
-		
-		String key = "personid";
-		String value = token;
-		
-		Document personDoc = findHardly(key, value);
-		
-		if (personDoc != null) return true;
-		return false;
-	}
-	
+	/* 회원 검색 서비스 */
 	public Person personSearch (String key, String value) throws Exception {
 		
 		Document personDoc = findHardly(key, value);
@@ -112,6 +103,102 @@ public class PersonService {
 		}
 		
 		return person;
+	}
+	
+	/* 회원 주소 등록 서비스 */
+	public boolean partyAddressWrite (long personId, long addressId) throws Exception {
+
+		try {
+			// party address 중복 여부 확인
+			if (getPartyAddressDoc(personId, addressId) != null) {
+				throw new Exception("회원 정보에 이미 등록된 주소입니다."); 
+			}
+
+			// 중복이 아니면 write
+			Document doc = new Document();
+
+			doc.add(new TextField("partyaddressid", "" + addressId, Store.YES));
+			doc.add(new TextField("partyaddresspersonid", "" + personId, Store.YES));
+			
+			write(doc);
+			return true;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
+	/* 회원 주소 삭제 서비스 */
+	public boolean partyAddressDelete (long personId, long addressId) throws Exception {
+		
+		try {
+			// party address 존재 여부 확인
+			if (getPartyAddressDoc(personId, addressId) == null) {
+				throw new Exception("회원 정보에 해당 주소가 없습니다."); 
+			} 
+	
+			// 존재하면 delete
+			Term term1 = new Term("partyaddressid", "" + addressId);
+			Term term2 = new Term("partyaddresspersonid", "" + personId);
+			
+			delete(term1, term2);
+			return true;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
+	/* 회원 전화번호 등록 서비스 */
+	public boolean partyPhoneWrite (long personId, long phoneId) throws Exception {
+
+		try {
+			// party phone 중복 여부 확인
+			if (getPartyPhoneDoc(personId, phoneId) != null) {
+				throw new Exception("회원정보에 이미 등록된 전화번호입니다."); 
+			} 
+	
+			// 중복이 아니면 write
+			Document doc = new Document();
+
+			doc.add(new TextField("partyphoneid", "" + phoneId, Store.YES));
+			doc.add(new TextField("partyphonepersonid", "" + personId, Store.YES));
+			
+			write(doc);
+			return true;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
+	/* 회원 전화번호 삭제 서비스 */
+	public boolean partyPhoneDelete (long personId, long phoneId) throws Exception {
+		
+		try {
+			// party phone 존재 여부 확인
+			if (getPartyPhoneDoc(personId, phoneId) == null) {
+				throw new Exception("회원정보에 해당 전화번호가 없습니다."); 
+			} 
+	
+			// 존재하면 delete
+			Term term1 = new Term("partyphoneid", "" + phoneId);
+			Term term2 = new Term("partyphonepersonid", "" + personId);
+			
+			delete(term1, term2);
+			return true;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
+	/* 회원(token) 인증 서비스 */
+	public boolean isValidPerson (String token) throws Exception {
+		
+		String key = "personid";
+		String value = token;
+
+		if (findHardly(key, value) != null) {
+			return true;
+		}
+		return false;
 	}
 	
 	public List<Document> setPluralDoc (Person person) {
@@ -173,9 +260,9 @@ public class PersonService {
 		
 		Term term1 = new Term("partyaddressid", "" + addressId);
 		Term term2 = new Term("partyaddresspersonid", "" + personId);
-		Document doc = findHardlyByTwoTerms(term1, term2);
+		Document partyAddressDoc = findHardly(term1, term2);
 		
-		return doc;
+		return partyAddressDoc;
 	}
 	
 	public List<Document> getPartyAddressDocList (Person person) {
@@ -199,9 +286,9 @@ public class PersonService {
 		
 		Term term1 = new Term("partyphoneid", "" + phoneId);
 		Term term2 = new Term("partyphonepersonid", "" + personId);
-		Document doc = findHardlyByTwoTerms(term1, term2);
+		Document partyPhoneDoc = findHardly(term1, term2);
 		
-		return doc;
+		return partyPhoneDoc;
 	}
 	
 	public List<Document> getPartyPhoneDocList (Person person) {
@@ -211,84 +298,6 @@ public class PersonService {
 		return partyPhoneDocList;
 	}
 	
-	public boolean partyAddressWrite (long personId, long addressId) throws Exception {
-
-		try {
-			// party address 중복 여부 확인
-			if (getPartyAddressDoc(personId, addressId) != null) {
-				throw new Exception("회원 정보에 이미 등록된 주소입니다."); 
-			}
-
-			// 중복이 아니면 write
-			Document doc = new Document();
-
-			doc.add(new TextField("partyaddressid", "" + addressId, Store.YES));
-			doc.add(new TextField("partyaddresspersonid", "" + personId, Store.YES));
-			
-			write(doc);
-			return true;
-		} catch (Exception e) {
-			throw e;
-		}
-	}
 	
-	public boolean partyAddressDelete (long personId, long addressId) throws Exception {
-		
-		try {
-			// party address 존재 여부 확인
-			if (getPartyAddressDoc(personId, addressId) == null) {
-				throw new Exception("회원정보에 해당 주소가 없습니다."); 
-			} 
-	
-			// 존재하면 delete
-			Term term1 = new Term("partyaddressid", "" + addressId);
-			Term term2 = new Term("partyaddresspersonid", "" + personId);
-			
-			deleteByTwoTerms(term1, term2);
-			return true;
-		} catch (Exception e) {
-			throw e;
-		}
-	}
-	
-	public boolean partyPhoneWrite (long personId, long phoneId) throws Exception {
-
-		try {
-			// party phone 중복 여부 확인
-			if (getPartyPhoneDoc(personId, phoneId) != null) {
-				throw new Exception("회원정보에 이미 등록된 전화번호입니다."); 
-			} 
-	
-			// 중복이 아니면 write
-			Document doc = new Document();
-
-			doc.add(new TextField("partyphoneid", "" + phoneId, Store.YES));
-			doc.add(new TextField("partyphonepersonid", "" + personId, Store.YES));
-			
-			write(doc);
-			return true;
-		} catch (Exception e) {
-			throw e;
-		}
-	}
-	
-	public boolean partyPhoneDelete (long personId, long phoneId) throws Exception {
-		
-		try {
-			// party phone 존재 여부 확인
-			if (getPartyPhoneDoc(personId, phoneId) == null) {
-				throw new Exception("회원정보에 해당 전화번호가 없습니다."); 
-			} 
-	
-			// 존재하면 delete
-			Term term1 = new Term("partyphoneid", "" + phoneId);
-			Term term2 = new Term("partyphonepersonid", "" + personId);
-			
-			deleteByTwoTerms(term1, term2);
-			return true;
-		} catch (Exception e) {
-			throw e;
-		}
-	}
 	
 }
