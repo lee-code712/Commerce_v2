@@ -43,6 +43,12 @@ public class PurchaseService {
 	public boolean purchase (Purchase purchase) throws Exception {
 
 		try {
+			// 상품의 구매 수량 유효성 검사
+			if (!inventorySvc.inventoryQuantityCheck(purchase.getProductId(), purchase.getPurchaseNumber())) {
+				throw new Exception("상품 ID: " + purchase.getProductId() + "의 재고 수량이 부족합니다.");
+			}
+			
+			// 상품의 구매 수량이 유효하면 write
 			Document purchaseDoc = new Document();
 			
 			purchaseDoc.add(new TextField("purchasepersonid", "" + purchase.getPersonId(), Store.YES));
@@ -65,7 +71,7 @@ public class PurchaseService {
 		try {
 			Cart cart = cartSvc.setCart(cartValueList);
 			
-			// 장바구니 상품들의 구매 수량 유효성 검증
+			// 장바구니 상품들의 구매 수량 유효성 검사
 			String errorMsg = "아래 상품들의 재고 수량이 부족합니다.\n";
 			boolean exceptionFlag = false;
 			
@@ -82,18 +88,17 @@ public class PurchaseService {
 				throw new Exception(errorMsg);
 			}
 			
-			// 구매 수량을 초과하지 않는 경우 write
+			// 모든 상품의 구매 수량이 유효하면 write
 			List<Document> docList = setPluralDoc(purchase, cart);
 			
 			for (Document doc : docList) {
 				write(doc);
 				
-				// 재고 수량 update
+				// 해당 상품의 재고 수량 update
 				Inventory inventory = inventorySvc.inventorySearchByProduct("productid", doc.get("purchaseproductid"));
 				inventory.setQuantity(inventory.getQuantity() - Long.valueOf(doc.get("purchasenumber")));
 				inventorySvc.inventoryUpdate(inventory);
 			}
-			
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -170,7 +175,6 @@ public class PurchaseService {
 		
 		for (CartProduct cartProduct : cart.getCart()) {
 
-			// purchase doc add
 			Document purchaseDoc = new Document();
 			
 			purchaseDoc.add(new TextField("purchaseproductid", "" + cartProduct.getProductId(), Store.YES));

@@ -189,8 +189,8 @@ public class PersonService {
 		}
 	}
 	
-	/* 회원(token) 인증 서비스 */
-	public boolean isValidPerson (String token) throws Exception {
+	/* 회원 ID (token) 유효성 검사 */
+	public boolean personIdCheck (String token) throws Exception {
 		
 		String key = "personid";
 		String value = token;

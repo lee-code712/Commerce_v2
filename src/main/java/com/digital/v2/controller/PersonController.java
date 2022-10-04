@@ -152,7 +152,7 @@ public class PersonController {
 		Person person = new Person();
 		try {
 			// 유효한 token(personId)인지 확인
-			if (!personSvc.isValidPerson(token)) {
+			if (!personSvc.personIdCheck(token)) {
 				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
 			}
 			
@@ -181,7 +181,7 @@ public class PersonController {
 		Person person = new Person();
 		try {
 			// 유효한 token(personId)인지 확인
-			if (!personSvc.isValidPerson(token)) {
+			if (!personSvc.personIdCheck(token)) {
 				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
 			}
 			
@@ -210,7 +210,7 @@ public class PersonController {
 		Person person = new Person();
 		try {
 			// 유효한 token(personId)인지 확인
-			if (!personSvc.isValidPerson(token)) {
+			if (!personSvc.personIdCheck(token)) {
 				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
 			}
 			
@@ -239,7 +239,7 @@ public class PersonController {
 		Person person = new Person();
 		try {
 			// 유효한 token(personId)인지 확인
-			if (!personSvc.isValidPerson(token)) {
+			if (!personSvc.personIdCheck(token)) {
 				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
 			}
 			

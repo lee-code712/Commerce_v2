@@ -6,7 +6,6 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -84,10 +83,7 @@ public class CookieUtils {
 		}
 
 		if (!sumValue.equals("")) {
-			Cookie cookie = new Cookie(key, URLEncoder.encode(sumValue, encoding));
-			cookie.setMaxAge(60 * 60 * 24 * day);
-			cookie.setPath(path);
-			response.addCookie(cookie);
+			createCookie(key, sumValue, 1, request, response);
 		}
 	}
 
@@ -116,94 +112,44 @@ public class CookieUtils {
 				sumValue = (sumValue.substring(0, sumValue.length() - 1)).replaceAll(" ", "");
 			}
 		}
-		Cookie cookie = null;
-		int time = 60 * 60 * 24 * 20;
 
 		if (sumValue.equals("")) {
-			time = 0;
+			deleteCookie(key, response);
 		}
-
-		cookie = new Cookie(key, URLEncoder.encode(sumValue, encoding));
-		cookie.setMaxAge(time);
-		cookie.setPath(path);
-		response.addCookie(cookie);
+		else {
+			createCookie (key, sumValue, 1, request, response);
+		}
 	}
 
-	/**
-	 * @description 일반적인 쿠키 생성
-	 * @params key: 쿠키 이름, value: 쿠키 이름과 짝을 이루는 값, day: 쿠키의 수명
-	 */
-	public static Cookie createNewCookie(String key, String value, int day, HttpServletRequest request,
+	// 쿠키 생성
+	public static void createCookie (String key, String value, int day, HttpServletRequest request,
 			HttpServletResponse response) throws UnsupportedEncodingException {
 		Cookie cookie = new Cookie(key, URLEncoder.encode(value, encoding));
 		cookie.setPath(path);
 		cookie.setMaxAge(60 * 60 * 24 * day);
 		response.addCookie(cookie);
-		return cookie;
 	}
 	
-	/**
-	 * @description 쿠키 삭제
-	 * @params
-	 */
-	public static void deleteCookie(String key, HttpServletResponse response)
-			throws UnsupportedEncodingException {
+	// 쿠키 삭제
+	public static void deleteCookie (String key, HttpServletResponse response) throws UnsupportedEncodingException {
 	    Cookie cookie = new Cookie(key, "");
-	    cookie.setPath("/");
+	    cookie.setPath(path);
 	    cookie.setMaxAge(0);
 	    response.addCookie(cookie);
 	}
 	
-	/**
-	 * @description 모든 쿠키 삭제
-	 * @params
-	 */
-	public static void deleteAllCookie(HttpServletRequest request, HttpServletResponse response)
+	// 모든 쿠키 삭제
+	public static void deleteAllCookie (HttpServletRequest request, HttpServletResponse response) 
 			throws UnsupportedEncodingException {
 	    Cookie[] cookies = request.getCookies();
 	    if (cookies != null) {
 	        for (int i = 0; i < cookies.length; i++) {
 	        	cookies[i].setValue("");
-	        	cookies[i].setPath("/");
+	        	cookies[i].setPath(path);
 	            cookies[i].setMaxAge(0);
 	            response.addCookie(cookies[i]);
 	        }
 	    }
 	}
 
-	/**
-	 * @description 쿠키들을 맵으로 반환한다.
-	 * @params
-	 */
-	public HashMap getValueMap(HttpServletRequest request) {
-		HashMap cookieMap = new HashMap();
-
-		Cookie[] cookies = request.getCookies();
-		if (cookies != null) {
-			for (int i = 0; i < cookies.length; i++) {
-				cookieMap.put(cookies[i].getName(), cookies[i]);
-			}
-		}
-
-		return cookieMap;
-	}
-
-	/**
-	 * @description ","로 구분된 값이 아닌 단일 값으로 저장된 쿠키의 값을 반환한다.
-	 * @params key: 쿠키 이름
-	 */
-	public String getValue(String key, HttpServletRequest request) throws UnsupportedEncodingException {
-		Cookie cookie = (Cookie) getValueMap(request).get(key);
-		if (cookie == null)
-			return null;
-		return URLDecoder.decode(cookie.getValue(), encoding);
-	}
-
-	/**
-	 * @description 쿠키가 있는지 확인.
-	 * @params key: 쿠키 이름
-	 */
-	public boolean isExist(String key, HttpServletRequest request) {
-		return getValueMap(request).get(key) != null;
-	}
 }

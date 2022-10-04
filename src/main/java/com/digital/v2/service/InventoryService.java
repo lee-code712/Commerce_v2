@@ -99,7 +99,7 @@ public class InventoryService {
 		return inventory;
 	}
 
-	/* 상품에 대한 입력 수량 유효성 검증 */
+	/* 상품에 대한 입력 수량 유효성 검사 */
 	public boolean inventoryQuantityCheck (long productId, long quantity) throws Exception {
 		
 		Inventory inventory = inventorySearchByProduct("productid", "" + productId);
