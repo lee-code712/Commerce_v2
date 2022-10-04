@@ -20,8 +20,8 @@ import com.digital.v2.schema.Phone;
 import com.digital.v2.schema.Product;
 import com.digital.v2.schema.Purchase;
 import com.digital.v2.schema.PurchaseDetail;
-import com.digital.v2.schema.ShoppingCart;
-import com.digital.v2.schema.ShoppingCartItem;
+import com.digital.v2.schema.Cart;
+import com.digital.v2.schema.CartProduct;
 
 @Component
 public class PurchaseService {
@@ -35,21 +35,21 @@ public class PurchaseService {
 	@Resource
 	PhoneService phoneSvc;
 	@Resource
-	ShoppingCartService shoppingCartSvc;
+	CartService cartSvc;
 	
-	public boolean purchaseWithCartWrite (List<String> cartItemStringList, Purchase purchase) throws Exception {
+	public boolean purchaseWithCartWrite (List<String> cartValueList, Purchase purchase) throws Exception {
 		
 		String errorMsg = "아래 상품들의 구매 수량이 재고 수량을 초과합니다.\n";
 		try {
-			ShoppingCart shoppingCart = shoppingCartSvc.setShoppingCart(cartItemStringList);
+			Cart cart = cartSvc.setCart(cartValueList);
 			
 			// 장바구니 상품들의 구매 수량 초과 여부 확인
 			boolean flag = false;
-			for (ShoppingCartItem cartItem : shoppingCart.getShoppingCart()) {
-				Inventory inventory = inventorySvc.inventorySearchByProduct("productid", "" + cartItem.getProductId());
-				if (inventory.getQuantity() - cartItem.getPurchaseNumber() < 0) {
-					errorMsg += "상품 ID: " + cartItem.getProductId() 
-						+ ", 구매 수량: " + cartItem.getPurchaseNumber()
+			for (CartProduct cartProduct : cart.getCart()) {
+				Inventory inventory = inventorySvc.inventorySearchByProduct("productid", "" + cartProduct.getProductId());
+				if (inventory.getQuantity() - cartProduct.getPurchaseNumber() < 0) {
+					errorMsg += "상품 ID: " + cartProduct.getProductId() 
+						+ ", 구매 수량: " + cartProduct.getPurchaseNumber()
 						+ ", 재고 수량: " + inventory.getQuantity() + "\n";
 					if (!flag) {
 						flag = true;
@@ -61,18 +61,18 @@ public class PurchaseService {
 				throw new Exception(errorMsg);
 			}
 
-			for (ShoppingCartItem cartItem : shoppingCart.getShoppingCart()) {
+			for (CartProduct cartProduct : cart.getCart()) {
 				// cart 상품정보 set
-				Purchase itemPurchase = purchase;
-				purchase.setProductId(cartItem.getProductId());
-				purchase.setPurchaseNumber(cartItem.getPurchaseNumber());
+				Purchase productPurchase = purchase;
+				purchase.setProductId(cartProduct.getProductId());
+				purchase.setPurchaseNumber(cartProduct.getPurchaseNumber());
 
 				// 구매정보 write
-				purchaseWrite(itemPurchase);
+				purchaseWrite(productPurchase);
 				
 				// 재고정보 변경
-				Inventory inventory = inventorySvc.inventorySearchByProduct("productid", "" + cartItem.getProductId());
-				inventory.setQuantity(inventory.getQuantity() - cartItem.getPurchaseNumber());
+				Inventory inventory = inventorySvc.inventorySearchByProduct("productid", "" + cartProduct.getProductId());
+				inventory.setQuantity(inventory.getQuantity() - cartProduct.getPurchaseNumber());
 				inventorySvc.inventoryUpdate(inventory);
 			}
 			return true;

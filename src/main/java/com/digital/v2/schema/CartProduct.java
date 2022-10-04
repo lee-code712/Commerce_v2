@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel
-public class ShoppingCartItem {
+public class CartProduct {
 	
 	@ApiModelProperty(required = true, position = 1, notes = "상품 ID", example = "0", dataType = "long")
 	private long productId;
