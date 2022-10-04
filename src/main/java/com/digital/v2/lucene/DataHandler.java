@@ -166,6 +166,39 @@ public class DataHandler {	// lucene 레퍼지토리 정보
 		return docList;
 	}
 	
+	public static List<Document> findListHardlyByTwoTerms(Term term1, Term term2) {
+		
+		List<Document> docList = new ArrayList<Document>();
+		Document doc = null;
+		
+		try {
+			IndexReader reader = DirectoryReader.open(dir);
+			IndexSearcher searcher = new IndexSearcher(reader);
+			
+			TermQuery termQuery1 = new TermQuery(term1);
+			TermQuery termQuery2 = new TermQuery(term2);
+			
+			System.out.println(termQuery2);
+
+			BooleanQuery wordQuery = new BooleanQuery.Builder()
+				.add(termQuery1, Occur.MUST)
+				.add(termQuery2, Occur.MUST)
+				.build();
+			
+			TopDocs foundDocsBody = searcher.search(wordQuery, 1000);
+			for (ScoreDoc sd : foundDocsBody.scoreDocs) {
+				doc = searcher.doc(sd.doc);
+				docList.add(doc);
+//				System.out.println(doc.getFields());
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return docList;
+	}
+	
 	public static Document findHardly(String key, String value) {
 		
 		Document doc = null;

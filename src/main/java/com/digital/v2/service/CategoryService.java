@@ -23,12 +23,12 @@ public class CategoryService {
 			
 			// 중복이 아니면 write
 			category.setCategoryId(System.currentTimeMillis());
-			Document doc = new Document();
+			Document categoryDoc = new Document();
 			
-			doc.add(new TextField("categoryid", "" + category.getCategoryId(), Store.YES));
-			doc.add(new TextField("categoryname", "" + category.getCategoryName(), Store.YES));
+			categoryDoc.add(new TextField("categoryid", "" + category.getCategoryId(), Store.YES));
+			categoryDoc.add(new TextField("categoryname", "" + category.getCategoryName(), Store.YES));
 			
-			write(doc);
+			write(categoryDoc);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -37,12 +37,12 @@ public class CategoryService {
 	
 	public Category categorySearch (String key, String value) throws Exception {
 		
-		Document doc = findHardly(key, value);
+		Document categoryDoc = findHardly(key, value);
 		
 		Category category = new Category();
-		if (doc != null) {
-			category.setCategoryId(Long.parseLong(doc.get("categoryid")));
-			category.setCategoryName(doc.get("categoryname"));
+		if (categoryDoc != null) {
+			category.setCategoryId(Long.parseLong(categoryDoc.get("categoryid")));
+			category.setCategoryName(categoryDoc.get("categoryname"));
 		}
 		
 		return category;

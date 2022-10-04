@@ -16,11 +16,13 @@ public class CartService {
 
 	@Resource
 	InventoryService inventorySvc;
+	@Resource
+	ProductService productSvc;
 
 	public boolean isValidCartProduct (List<String> cartValueList, CartProduct cartProduct) throws Exception {
 		
 		try {
-			// cartItem 중복 여부 확인
+			// cart product 중복 여부 확인
 			if (cartValueList != null) {
 				for (String cartValue : cartValueList) {
 					if (cartValue.split("/")[0].equals("" + cartProduct.getProductId())) {
@@ -44,7 +46,7 @@ public class CartService {
 	public boolean isExistCartProduct (List<String> cartValueList, CartProduct cartProduct) throws Exception {
 		
 		try {
-			// cartItem 존재 여부 확인
+			// cart product 존재 여부 확인
 			if (cartValueList != null) {
 				for (String cartValue : cartValueList) {
 					if (cartValue.split("/")[0].equals("" + cartProduct.getProductId())) {

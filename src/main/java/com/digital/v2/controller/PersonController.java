@@ -139,7 +139,7 @@ public class PersonController {
 		
 		try {
 			Person person = personSvc.personSearch("personname", personName);
-			if (person.getPersonName() != null && person.getPersonId() != Long.valueOf(token)) {
+			if (person.getPersonId() != Long.valueOf(token)) {
 				return ExceptionUtils.setException(errors, 401, "유효하지 않은 token 사용으로 접근할 수 없습니다.", header);
 			}
 			return new ResponseEntity<Person>(person, header, HttpStatus.valueOf(200));

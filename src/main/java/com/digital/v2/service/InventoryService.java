@@ -26,7 +26,9 @@ public class InventoryService {
 		try {
 			// inventory 중복 여부 확인
 			if (inventorySearch("inventoryid", "" + inventory.getInventoryId()).getInventoryId() != 0) {
-				throw new Exception("상품에 대한 재고가 이미 등록되어 있습니다.");
+				// 중복이면 update
+				inventoryUpdate(inventory);
+				return true;
 			}
 			
 			// 중복이 아니면 write
@@ -40,6 +42,19 @@ public class InventoryService {
 		} catch (Exception e) {
 			throw e;
 		}
+	}
+	
+	public Inventory inventorySearch (String key, String value) throws Exception {
+		
+		Document doc = findHardly(key, value);
+		
+		Inventory inventory = new Inventory();
+		if (doc != null) {
+			inventory.setInventoryId(Long.parseLong(doc.get("inventoryid")));
+			inventory.setQuantity(Long.parseLong(doc.get("quantity")));
+		}
+		
+		return inventory;
 	}
 	
 	public Inventory inventorySearchByProduct (String productKey, String productValue) throws Exception {
@@ -59,19 +74,6 @@ public class InventoryService {
 				inventory.setInventoryId(Long.parseLong(doc.get("inventoryid")));
 				inventory.setQuantity(Long.parseLong(doc.get("quantity")));
 			}
-		}
-		
-		return inventory;
-	}
-	
-	public Inventory inventorySearch (String key, String value) throws Exception {
-		
-		Document doc = findHardly(key, value);
-		
-		Inventory inventory = new Inventory();
-		if (doc != null) {
-			inventory.setInventoryId(Long.parseLong(doc.get("inventoryid")));
-			inventory.setQuantity(Long.parseLong(doc.get("quantity")));
 		}
 		
 		return inventory;

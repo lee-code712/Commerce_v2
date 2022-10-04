@@ -33,13 +33,17 @@ public class ProductController {
 	@Resource
 	ProductService productSvc;
 	
+	/**
+	 * @description 상품 등록
+	 * @params product: 상품 정보 (categoryId, price, productName)
+	 */
 	@RequestMapping(value = "/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "상품 등록", notes = "상품 등록을 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Product.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> productWrite (@Parameter(name = "상품 등록", description = "", required = true) @RequestBody Product product) {
+	public ResponseEntity<?> productWrite (@Parameter(name = "상품 정보", required = true) @RequestBody Product product) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
@@ -55,60 +59,48 @@ public class ProductController {
 		return new ResponseEntity<Product>(resProduct, header, HttpStatus.valueOf(200));
 	}
 
-	@RequestMapping(value = "/inquiry/byKeyword/{keyword}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "상품명 키워드 검색", notes = "특정 단어를 포함하는 상품명으로 상품을 검색하는 API.")
+	/**
+	 * @description 상품 검색
+	 * @params keyword: 검색 키워드
+	 */
+	@RequestMapping(value = "/inquiry/{keyword}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "상품명 키워드 검색", notes = "특정 단어를 포함하는 상품명으로 상품 목록을 검색하는 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = ProductList.class),
-		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)	// 에러를 담고 있는 schema를 따로 생성해서 사용
-	})
-	public ResponseEntity<?> productSearchBykeyword (@PathVariable String keyword) {
-		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
-		ErrorMsg errors = new ErrorMsg();
-		
-		try {
-			ProductList products = productSvc.productSearchByKeyword(keyword);
-			return new ResponseEntity<ProductList>(products, header, HttpStatus.valueOf(200));
-		} catch (Exception e) {
-			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
-		}
-	}
-	
-	@RequestMapping(value = "/inquiry/byCategory/{categoryName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "카테고리별 상품 검색", notes = "특정 카테고리의 상품을 검색하는 API.")
-	@ApiResponses({
-		@ApiResponse(code = 200, message = "성공", response = ProductList.class),
-		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)	// 에러를 담고 있는 schema를 따로 생성해서 사용
-	})
-	public ResponseEntity<?> productSearchByCategory (@PathVariable String categoryName) {
-		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
-		ErrorMsg errors = new ErrorMsg();
-		
-		try {
-			ProductList products = productSvc.productSearchByCategory(categoryName);
-			return new ResponseEntity<ProductList>(products, header, HttpStatus.valueOf(200));
-		} catch (Exception e) {
-			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
-		}
-	}
-	
-	@RequestMapping(value = "/inquiry/{productName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "상품 검색", notes = "상품명으로 상품을 검색하는 API.")
-	@ApiResponses({
-		@ApiResponse(code = 200, message = "성공", response = Product.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> productSearch (@PathVariable String productName) {
+	public ResponseEntity<?> productSearchBykeyword (@Parameter(name = "키워드", required = true) @PathVariable String keyword) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
 		try {
-			Product product = productSvc.productSearch("productname", productName);
-			return new ResponseEntity<Product>(product, header, HttpStatus.valueOf(200));
+			ProductList products = productSvc.productSearchByKeyword("productname", keyword);
+			return new ResponseEntity<ProductList>(products, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
 	}
 	
-	// 상품 상세 조회 서비스 추가 혹은 기존 서비스 변경
+	/**
+	 * @description 카테고리별 상품 검색
+	 * @params categoryName: 검색 키워드
+	 */
+	@RequestMapping(value = "/inquiry/byCategory/{categoryName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "카테고리별 상품 검색", notes = "특정 카테고리의 상품 목록을 검색하는 API.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message = "성공", response = ProductList.class),
+		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
+	})
+	public ResponseEntity<?> productSearchByCategory (@Parameter(name = "카테고리명", required = true) @PathVariable String categoryName) {
+		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
+		ErrorMsg errors = new ErrorMsg();
+		
+		try {
+			ProductList products = productSvc.productSearchByCategory("categoryname", categoryName);
+			return new ResponseEntity<ProductList>(products, header, HttpStatus.valueOf(200));
+		} catch (Exception e) {
+			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
+		}
+	}
 	
 }

@@ -96,7 +96,7 @@ public class InventoryController {
 		
 		Inventory resInventory = new Inventory();
 		try {
-			if (inventorySvc.inventoryUpdate(inventory)) {
+			if (inventorySvc.inventoryWrite(inventory)) {
 				resInventory = inventorySvc.inventorySearch("inventoryid", "" + inventory.getInventoryId());
 			}
 		} catch (Exception e) {

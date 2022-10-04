@@ -25,7 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.digital.v2.schema.ErrorMsg;
 import com.digital.v2.schema.Purchase;
-import com.digital.v2.schema.PurchaseDetail;
+import com.digital.v2.schema.PurchaseList;
+import com.digital.v2.service.PersonService;
 import com.digital.v2.service.PurchaseService;
 import com.digital.v2.utils.ExceptionUtils;
 
@@ -42,32 +43,42 @@ public class PurchaseController {
 	
 	@Resource
 	PurchaseService purchaseSvc;
+	@Resource
+	PersonService personSvc;
 	
+	/**
+	 * @description 상품 구매
+	 * @params purchase: 상품 구매 정보 (productId, purchaseNumber, addressId, phoneId)
+	 */
 	@RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "상품 구매", notes = "상품을 구매하기 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = List.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> purchase (@Parameter(name = "상품 구매", description = "", required = true) @RequestBody Purchase purchase,
+	public ResponseEntity<?> purchase (@Parameter(name = "상품 구매 정보", required = true) @RequestBody Purchase purchase,
 			HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		String token = request.getHeader("Authorization");
 
-		List<Purchase> resPurchaseList = new ArrayList<Purchase>();
+		List<Purchase> resPurchases = new ArrayList<Purchase>();
 		try {
+			if (!personSvc.isValidPerson(token)) {
+				return ExceptionUtils.setException(errors, 401, "유효하지 않은 token 사용으로 접근할 수 없습니다.", header);
+			}
+			
 			purchase.setPersonId(Long.valueOf(token));	// 토큰에서 사용자 id를 가져와 set
 			purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd HHmmss")));	// 현재 날짜 구해서 set
 			
 			if (purchaseSvc.purchaseWrite(purchase)) {
-				resPurchaseList = purchaseSvc.purchaseSearch("purchasedate", purchase.getPurchaseDate());
+				resPurchases = purchaseSvc.purchaseSearch(token, "purchasedate", purchase.getPurchaseDate());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
 
-		return new ResponseEntity<List<Purchase>>(resPurchaseList, header, HttpStatus.valueOf(200));
+		return new ResponseEntity<List<Purchase>>(resPurchases, header, HttpStatus.valueOf(200));
 	}
 	
 	@RequestMapping(value = "/shoppingCart", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -76,22 +87,26 @@ public class PurchaseController {
 		@ApiResponse(code = 200, message = "성공", response = List.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> purchaseWithCart (@Parameter(name = "장바구니 상품 일괄 구매", description = "", required = true) @RequestBody Purchase purchase,
+	public ResponseEntity<?> purchaseWithCart (@Parameter(name = "장바구니 상품 일괄 구매", required = true) @RequestBody Purchase purchase,
 			HttpServletRequest request, HttpServletResponse response) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		String token = request.getHeader("Authorization");
 
-		List<Purchase> resPurchaseList = new ArrayList<Purchase>();
+		List<Purchase> resPurchases = new ArrayList<Purchase>();
 		try {
-			List<String> cartItemStringList = getValueList("cart", request);
+			if (!personSvc.isValidPerson(token)) {
+				return ExceptionUtils.setException(errors, 401, "유효하지 않은 token 사용으로 접근할 수 없습니다.", header);
+			}
 			
-			if (cartItemStringList != null) {	
+			List<String> cartValueList = getValueList("cart", request);
+			
+			if (cartValueList != null) {	
 				purchase.setPersonId(Long.valueOf(token));	// 토큰에서 사용자 id를 가져와 set
-				purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd HHmmss")));	// 현재 날짜 구해서 set
+				purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd HH:mm:ss")));	// 현재 날짜 구해서 set
 				
-				if (purchaseSvc.purchaseWithCartWrite(cartItemStringList, purchase)) {
-					resPurchaseList = purchaseSvc.purchaseSearch("purchasedate", purchase.getPurchaseDate());
+				if (purchaseSvc.purchaseWithCartWrite(cartValueList, purchase)) {
+					resPurchases = purchaseSvc.purchaseSearch(token, "purchasedate", purchase.getPurchaseDate());
 					// 장바구니 삭제
 					deleteCookie("cart", response);
 				}
@@ -100,23 +115,28 @@ public class PurchaseController {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
 		
-		return new ResponseEntity<List<Purchase>>(resPurchaseList, header, HttpStatus.valueOf(200));
+		return new ResponseEntity<List<Purchase>>(resPurchases, header, HttpStatus.valueOf(200));
 	}
 
-	// 날짜로 구매 상세 조회
 	@RequestMapping(value = "/inquiry/{purchaseDate}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "구매 목록 조회", notes = "특정 날짜의 구매 목록을 검색하는 API.")
 	@ApiResponses({
-		@ApiResponse(code = 200, message = "성공", response = List.class),
-		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)	// 에러를 담고 있는 schema를 따로 생성해서 사용
+		@ApiResponse(code = 200, message = "성공", response = PurchaseList.class),
+		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> productSearchByCategory (@PathVariable String purchaseDate) {
+	public ResponseEntity<?> productSearchByCategory (@Parameter(name = "상품 구매 정보", required = false) @PathVariable String purchaseDate, 
+			HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
+		String token = request.getHeader("Authorization");
 		
 		try {
-			List<PurchaseDetail> purchaseList = purchaseSvc.purchaseDetailSearch("purchasedate", purchaseDate);
-			return new ResponseEntity<List<PurchaseDetail>>(purchaseList, header, HttpStatus.valueOf(200));
+			if (!personSvc.isValidPerson(token)) {
+				return ExceptionUtils.setException(errors, 401, "유효하지 않은 token 사용으로 접근할 수 없습니다.", header);
+			}
+			
+			PurchaseList purchases = purchaseSvc.purchaseDetailSearch(token, "purchasedate", purchaseDate);
+			return new ResponseEntity<PurchaseList>(purchases, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}

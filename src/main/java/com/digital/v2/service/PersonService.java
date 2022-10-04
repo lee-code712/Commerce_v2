@@ -217,8 +217,8 @@ public class PersonService {
 			// party address 중복 여부 확인
 			if (getPartyAddressDoc(personId, addressId) != null) {
 				throw new Exception("회원 정보에 이미 등록된 주소입니다."); 
-			} 
-	
+			}
+
 			// 중복이 아니면 write
 			Document doc = new Document();
 
@@ -254,7 +254,7 @@ public class PersonService {
 	public boolean partyPhoneWrite (long personId, long phoneId) throws Exception {
 
 		try {
-			// party address 중복 여부 확인
+			// party phone 중복 여부 확인
 			if (getPartyPhoneDoc(personId, phoneId) != null) {
 				throw new Exception("회원정보에 이미 등록된 전화번호입니다."); 
 			} 

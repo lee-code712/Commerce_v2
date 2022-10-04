@@ -23,12 +23,12 @@ public class PhoneService {
 			
 			// 중복이 아니면 write
 			phone.setPhoneId(System.currentTimeMillis());
-			Document doc = new Document();
+			Document phoneDoc = new Document();
 			
-			doc.add(new TextField("phoneid", "" + phone.getPhoneId(), Store.YES));
-			doc.add(new TextField("phonenumber", "" + phone.getPhoneNumber(), Store.YES));
+			phoneDoc.add(new TextField("phoneid", "" + phone.getPhoneId(), Store.YES));
+			phoneDoc.add(new TextField("phonenumber", "" + phone.getPhoneNumber(), Store.YES));
 				
-			write(doc);
+			write(phoneDoc);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -37,12 +37,12 @@ public class PhoneService {
 	
 	public Phone phoneSearch (String key, String value) throws Exception {
 		
-		Document doc = findHardly(key, value);
+		Document phoneDoc = findHardly(key, value);
 		
 		Phone phone = new Phone();
-		if (doc != null) {
-			phone.setPhoneId(Long.parseLong(doc.get("phoneid")));
-			phone.setPhoneNumber(doc.get("phonenumber"));
+		if (phoneDoc != null) {
+			phone.setPhoneId(Long.parseLong(phoneDoc.get("phoneid")));
+			phone.setPhoneNumber(phoneDoc.get("phonenumber"));
 		}
 		
 		return phone;

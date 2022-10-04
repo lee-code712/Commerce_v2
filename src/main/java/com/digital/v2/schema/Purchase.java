@@ -1,9 +1,9 @@
 package com.digital.v2.schema;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 
-@ArraySchema
+@ApiModel
 public class Purchase {
 
 	@ApiModelProperty(required = false, position = 1, notes = "회원 ID", example = "0", dataType = "long")
@@ -25,6 +25,7 @@ public class Purchase {
 	private String purchaseDate;
 
 	public long getPersonId() {
+		long personId = this.personId;
 		return personId;
 	}
 
@@ -33,6 +34,7 @@ public class Purchase {
 	}
 
 	public long getProductId() {
+		long productId = this.productId;
 		return productId;
 	}
 
@@ -41,6 +43,7 @@ public class Purchase {
 	}
 
 	public long getPurchaseNumber() {
+		long purchaseNumber = this.purchaseNumber;
 		return purchaseNumber;
 	}
 
@@ -49,6 +52,7 @@ public class Purchase {
 	}
 
 	public long getAddressId() {
+		long addressId = this.addressId;
 		return addressId;
 	}
 
@@ -57,6 +61,7 @@ public class Purchase {
 	}
 
 	public long getPhoneId() {
+		long phoneId = this.phoneId;
 		return phoneId;
 	}
 
@@ -65,6 +70,7 @@ public class Purchase {
 	}
 
 	public String getPurchaseDate() {
+		String purchaseDate = this.purchaseDate;
 		return purchaseDate;
 	}
 

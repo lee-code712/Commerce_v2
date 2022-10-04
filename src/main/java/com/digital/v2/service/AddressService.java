@@ -24,12 +24,12 @@ public class AddressService {
 	
 			// 중복이 아니면 write
 			address.setAddressId(System.currentTimeMillis());
-			Document doc = new Document();
+			Document addressDoc = new Document();
 			
-			doc.add(new TextField("addressid", "" + address.getAddressId(), Store.YES));
-			doc.add(new TextField("addressdetail", "" + address.getAddressDetail(), Store.YES));
+			addressDoc.add(new TextField("addressid", "" + address.getAddressId(), Store.YES));
+			addressDoc.add(new TextField("addressdetail", "" + address.getAddressDetail(), Store.YES));
 			
-			write(doc);
+			write(addressDoc);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -38,12 +38,12 @@ public class AddressService {
 	
 	public Address addressSearch (String key, String value) throws Exception {
 		
-		Document doc = findHardly(key, value);
+		Document addressDoc = findHardly(key, value);
 		
 		Address address = new Address();
-		if (doc != null) {
-			address.setAddressId(Long.parseLong(doc.get("addressid")));
-			address.setAddressDetail(doc.get("addressdetail"));
+		if (addressDoc != null) {
+			address.setAddressId(Long.parseLong(addressDoc.get("addressid")));
+			address.setAddressDetail(addressDoc.get("addressdetail"));
 		}
 		
 		return address;

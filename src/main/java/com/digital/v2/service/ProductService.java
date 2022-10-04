@@ -50,7 +50,6 @@ public class ProductService {
 		}
 	}
 
-
 	public Product productSearch (String key, String value) throws Exception {
 		
 		Document productDoc = findHardly(key, value);
@@ -67,10 +66,7 @@ public class ProductService {
 		return product;
 	}
 
-	public ProductList productSearchByKeyword (String keyword) throws Exception {
-		
-		String key = "productname";
-		String value = keyword;
+	public ProductList productSearchByKeyword (String key, String value) throws Exception {
 		
 		List<Document> productDocList = wildCardQuery(key, value);
 		
@@ -94,12 +90,12 @@ public class ProductService {
 		return productList;
 	}
 	
-	public ProductList productSearchByCategory (String categoryName) throws Exception {
+	public ProductList productSearchByCategory (String categoryKey, String categoryValue) throws Exception {
 		
 		String key = "productcategoryid";
 		String value;
 		
-		Category category = categorySvc.categorySearch("categoryname", categoryName);
+		Category category = categorySvc.categorySearch(categoryKey, categoryValue);
 
 		ProductList productList = new ProductList();
 		if (category.getCategoryName() != null) {
