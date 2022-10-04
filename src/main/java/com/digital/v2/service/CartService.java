@@ -31,7 +31,7 @@ public class CartService {
 			}
 			
 			// 중복이 아니면 입력 수량 유효성 검사
-			if (inventorySvc.inventoryQuantityCheck(cartProduct.getProductId(), cartProduct.getPurchaseNumber())) {
+			if (!inventorySvc.inventoryQuantityCheck(cartProduct.getProductId(), cartProduct.getPurchaseNumber())) {
 				throw new Exception("상품 ID: " + cartProduct.getProductId() + "의 재고 수량이 부족합니다.");
 			}
 			
