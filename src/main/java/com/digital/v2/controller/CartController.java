@@ -18,7 +18,7 @@ import com.digital.v2.schema.ErrorMsg;
 import com.digital.v2.schema.Cart;
 import com.digital.v2.schema.CartProduct;
 import com.digital.v2.service.CartService;
-import com.digital.v2.service.LoginService;
+import com.digital.v2.service.AuthService;
 import com.digital.v2.utils.ExceptionUtils;
 
 import io.swagger.annotations.ApiOperation;
@@ -35,7 +35,7 @@ public class CartController {
 	@Resource
 	CartService cartSvc;
 	@Resource
-	LoginService loginSvc;
+	AuthService authSvc;
 
 	@RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "장바구니 상품 추가", notes = "특정 상품을 장바구니에 추가하기 위한 API.")
@@ -51,7 +51,7 @@ public class CartController {
 		
 		Cart cart = new Cart();
 		try {
-			long personId = loginSvc.getPersonId(token);
+			long personId = authSvc.getPersonId(token);
 			
 			cartProduct.setPersonId(personId);
 			if (cartSvc.cartProductWrite(cartProduct)) {
@@ -78,7 +78,7 @@ public class CartController {
 		
 		Cart cart = new Cart();
 		try {
-			long personId = loginSvc.getPersonId(token);
+			long personId = authSvc.getPersonId(token);
 			
 			cartProduct.setPersonId(personId);
 			if (cartSvc.cartProductDelete(cartProduct)) {
@@ -103,7 +103,7 @@ public class CartController {
 		String token = request.getHeader("Authorization");
 		
 		try {
-			long personId = loginSvc.getPersonId(token);
+			long personId = authSvc.getPersonId(token);
 			
 			Cart cart = cartSvc.cartSearch(personId);
 			return new ResponseEntity<Cart>(cart, header, HttpStatus.valueOf(200));

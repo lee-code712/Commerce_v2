@@ -8,7 +8,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LoginService {
+public class AuthService {
 
 	private static Map<String, Map<Long, Long>> tokenMap;
 	

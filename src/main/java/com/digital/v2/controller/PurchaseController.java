@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.digital.v2.schema.ErrorMsg;
 import com.digital.v2.schema.Purchase;
 import com.digital.v2.schema.PurchaseList;
-import com.digital.v2.service.LoginService;
+import com.digital.v2.service.AuthService;
 import com.digital.v2.service.PurchaseService;
 import com.digital.v2.utils.ExceptionUtils;
 
@@ -41,7 +41,7 @@ public class PurchaseController {
 	@Resource
 	PurchaseService purchaseSvc;
 	@Resource
-	LoginService loginSvc;
+	AuthService authSvc;
 	
 	@RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "상품 구매", notes = "상품을 구매하기 위한 API.")
@@ -57,7 +57,7 @@ public class PurchaseController {
 
 		List<Purchase> resPurchases = new ArrayList<Purchase>();
 		try {
-			long personId = loginSvc.getPersonId(token);
+			long personId = authSvc.getPersonId(token);
 			
 			purchase.setPersonId(personId);
 			purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
@@ -85,7 +85,7 @@ public class PurchaseController {
 
 		List<Purchase> resPurchases = new ArrayList<Purchase>();
 		try {
-			long personId = loginSvc.getPersonId(token);
+			long personId = authSvc.getPersonId(token);
 			
 			purchase.setPersonId(personId);
 			purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
@@ -112,7 +112,7 @@ public class PurchaseController {
 		String token = request.getHeader("Authorization");
 		
 		try {
-			long personId = loginSvc.getPersonId(token);
+			long personId = authSvc.getPersonId(token);
 			
 			PurchaseList purchases = purchaseSvc.purchaseDetailSearch("" + personId, "purchasedate", keyword);
 			return new ResponseEntity<PurchaseList>(purchases, header, HttpStatus.valueOf(200));

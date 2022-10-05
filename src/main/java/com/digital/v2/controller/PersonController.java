@@ -19,7 +19,7 @@ import com.digital.v2.schema.ErrorMsg;
 import com.digital.v2.schema.Person;
 import com.digital.v2.schema.Phone;
 import com.digital.v2.schema.SuccessMsg;
-import com.digital.v2.service.LoginService;
+import com.digital.v2.service.AuthService;
 import com.digital.v2.service.PersonService;
 import com.digital.v2.utils.ExceptionUtils;
 
@@ -37,7 +37,7 @@ public class PersonController {
 	@Resource
 	private PersonService personSvc;
 	@Resource
-	private LoginService loginSvc;
+	private AuthService authSvc;
 	
 	@RequestMapping(value = "/signUp", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "회원가입", notes = "회원가입을 위한 API.")
@@ -79,7 +79,7 @@ public class PersonController {
 			}
 
 			// token set
-			String token = loginSvc.setToken(resPerson.getPersonId());
+			String token = authSvc.setToken(resPerson.getPersonId());
 
 			success.setSuccessCode(200);
 			success.setSuccessMsg("access token: " + token);
@@ -104,7 +104,7 @@ public class PersonController {
 		
 		try {
 			// token delete
-			loginSvc.deleteToken(token);
+			authSvc.deleteToken(token);
 			
 			success.setSuccessCode(200);
 			success.setSuccessMsg("로그아웃 되었습니다.");
@@ -131,7 +131,7 @@ public class PersonController {
 			Person person = personSvc.personSearch("personname", personName);	
 			
 			// 검색해 온 person 객체가 회원의 정보인지 확인
-			long personId = loginSvc.getPersonId(token);
+			long personId = authSvc.getPersonId(token);
 			
 			if (person.getPersonId() != personId) {
 				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
@@ -156,7 +156,7 @@ public class PersonController {
 
 		Person person = new Person();
 		try {
-			long personId = loginSvc.getPersonId(token);
+			long personId = authSvc.getPersonId(token);
 			
 			if (personSvc.partyAddressWrite(personId, address.getAddressId())) {
 				person = personSvc.personSearch("personid", "" + personId);
@@ -182,7 +182,7 @@ public class PersonController {
 		
 		Person person = new Person();
 		try {
-			long personId = loginSvc.getPersonId(token);
+			long personId = authSvc.getPersonId(token);
 			
 			if (personSvc.partyAddressDelete(personId, address.getAddressId())) {
 				person = personSvc.personSearch("personid", "" + personId);
@@ -208,7 +208,7 @@ public class PersonController {
 
 		Person person = new Person();
 		try {
-			long personId = loginSvc.getPersonId(token);
+			long personId = authSvc.getPersonId(token);
 			
 			if (personSvc.partyPhoneWrite(personId, phone.getPhoneId())) {
 				person = personSvc.personSearch("personid", "" + personId);
@@ -234,7 +234,7 @@ public class PersonController {
 
 		Person person = new Person();
 		try {
-			long personId = loginSvc.getPersonId(token);
+			long personId = authSvc.getPersonId(token);
 			
 			if (personSvc.partyPhoneDelete(personId, phone.getPhoneId())) {
 				person = personSvc.personSearch("personid", "" + personId);

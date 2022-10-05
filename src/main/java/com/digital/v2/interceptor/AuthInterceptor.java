@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import com.digital.v2.service.LoginService;
+import com.digital.v2.service.AuthService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +29,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         log.info("preHandle: " + token);
         
         // token이 map에 저장되어 있지 않으면 false
-        if (LoginService.getLoginMap(token) == null) {
+        if (AuthService.getLoginMap(token) == null) {
         	response.setContentType("application/json");
         	response.setCharacterEncoding("UTF-8");
         	response.getWriter().write("{\"errorCode\":\"401\",\"errorMsg\":\"유효하지 않은 접근입니다.\"}");
@@ -39,12 +39,12 @@ public class AuthInterceptor implements HandlerInterceptor {
         // 유효 시간 갱신
 		long currentTime = System.currentTimeMillis();
         
-		Map<Long, Long> loginMap = LoginService.getLoginMap(token);
+		Map<Long, Long> loginMap = AuthService.getLoginMap(token);
 		Set<Long> set = loginMap.keySet();
 		Iterator<Long> iterator = set.iterator();
 		loginMap.put(iterator.next(), currentTime);
 		
-		LoginService.setLoginMap(token, loginMap);
+		AuthService.setLoginMap(token, loginMap);
 
         return true;
     }
