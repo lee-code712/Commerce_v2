@@ -131,7 +131,7 @@ public class PersonController {
 			Person person = personSvc.personSearch("personname", personName);	
 			
 			// 검색해 온 person 객체가 회원의 정보인지 확인
-			long personId = loginSvc.getLoginValue(token);
+			long personId = loginSvc.getPersonId(token);
 			
 			if (person.getPersonId() != personId) {
 				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
@@ -156,7 +156,7 @@ public class PersonController {
 
 		Person person = new Person();
 		try {
-			long personId = loginSvc.getLoginValue(token);
+			long personId = loginSvc.getPersonId(token);
 			
 			if (personSvc.partyAddressWrite(personId, address.getAddressId())) {
 				person = personSvc.personSearch("personid", "" + personId);
@@ -182,7 +182,7 @@ public class PersonController {
 		
 		Person person = new Person();
 		try {
-			long personId = loginSvc.getLoginValue(token);
+			long personId = loginSvc.getPersonId(token);
 			
 			if (personSvc.partyAddressDelete(personId, address.getAddressId())) {
 				person = personSvc.personSearch("personid", "" + personId);
@@ -208,7 +208,7 @@ public class PersonController {
 
 		Person person = new Person();
 		try {
-			long personId = loginSvc.getLoginValue(token);
+			long personId = loginSvc.getPersonId(token);
 			
 			if (personSvc.partyPhoneWrite(personId, phone.getPhoneId())) {
 				person = personSvc.personSearch("personid", "" + personId);
@@ -234,7 +234,7 @@ public class PersonController {
 
 		Person person = new Person();
 		try {
-			long personId = loginSvc.getLoginValue(token);
+			long personId = loginSvc.getPersonId(token);
 			
 			if (personSvc.partyPhoneDelete(personId, phone.getPhoneId())) {
 				person = personSvc.personSearch("personid", "" + personId);

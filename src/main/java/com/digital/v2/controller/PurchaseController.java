@@ -57,7 +57,7 @@ public class PurchaseController {
 
 		List<Purchase> resPurchases = new ArrayList<Purchase>();
 		try {
-			long personId = loginSvc.getLoginValue(token);
+			long personId = loginSvc.getPersonId(token);
 			
 			purchase.setPersonId(personId);
 			purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
@@ -85,7 +85,7 @@ public class PurchaseController {
 
 		List<Purchase> resPurchases = new ArrayList<Purchase>();
 		try {
-			long personId = loginSvc.getLoginValue(token);
+			long personId = loginSvc.getPersonId(token);
 			
 			purchase.setPersonId(personId);
 			purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
@@ -112,7 +112,7 @@ public class PurchaseController {
 		String token = request.getHeader("Authorization");
 		
 		try {
-			long personId = loginSvc.getLoginValue(token);
+			long personId = loginSvc.getPersonId(token);
 			
 			PurchaseList purchases = purchaseSvc.purchaseDetailSearch("" + personId, "purchasedate", keyword);
 			return new ResponseEntity<PurchaseList>(purchases, header, HttpStatus.valueOf(200));

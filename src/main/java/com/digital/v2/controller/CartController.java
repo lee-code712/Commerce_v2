@@ -51,7 +51,7 @@ public class CartController {
 		
 		Cart cart = new Cart();
 		try {
-			long personId = loginSvc.getLoginValue(token);
+			long personId = loginSvc.getPersonId(token);
 			
 			cartProduct.setPersonId(personId);
 			if (cartSvc.cartProductWrite(cartProduct)) {
@@ -78,7 +78,7 @@ public class CartController {
 		
 		Cart cart = new Cart();
 		try {
-			long personId = loginSvc.getLoginValue(token);
+			long personId = loginSvc.getPersonId(token);
 			
 			cartProduct.setPersonId(personId);
 			if (cartSvc.cartProductDelete(cartProduct)) {
@@ -103,7 +103,7 @@ public class CartController {
 		String token = request.getHeader("Authorization");
 		
 		try {
-			long personId = loginSvc.getLoginValue(token);
+			long personId = loginSvc.getPersonId(token);
 			
 			Cart cart = cartSvc.cartSearch(personId);
 			return new ResponseEntity<Cart>(cart, header, HttpStatus.valueOf(200));
