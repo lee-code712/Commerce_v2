@@ -102,11 +102,18 @@ public class InventoryService {
 	/* 상품에 대한 입력 수량 유효성 검사 */
 	public boolean inventoryQuantityCheck (long productId, long quantity) throws Exception {
 		
-		Inventory inventory = inventorySearchByProduct("productid", "" + productId);
-		
-		if (inventory.getQuantity() - quantity < 0) {
-			return false;
+		try {
+			Inventory inventory = inventorySearchByProduct("productid", "" + productId);
+			
+			if (inventory.getInventoryId() == 0) {
+				throw new Exception("아직 재고를 등록하지 않은 상품입니다.");
+			}		
+			if (inventory.getQuantity() - quantity < 0) {
+				return false;
+			}	
+			return true;
+		} catch (Exception e) {
+			throw e;
 		}
-		return true;
 	}
 }

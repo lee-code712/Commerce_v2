@@ -101,8 +101,6 @@ public class PersonController {
 			// cart cookie 삭제
 			deleteCookie("cart", response);
 			
-			// authorize token 헤더에서 삭제
-			
 			success.setSuccessCode(200);
 			success.setSuccessMsg("로그아웃 되었습니다.");
 		} catch (Exception e) {
