@@ -2,7 +2,6 @@ package com.digital.v2.controller;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +19,7 @@ import com.digital.v2.schema.ErrorMsg;
 import com.digital.v2.schema.Person;
 import com.digital.v2.schema.Phone;
 import com.digital.v2.schema.SuccessMsg;
+import com.digital.v2.service.LoginService;
 import com.digital.v2.service.PersonService;
 import com.digital.v2.utils.ExceptionUtils;
 
@@ -29,8 +29,6 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import static com.digital.v2.utils.CookieUtils.deleteCookie;
-
 @RestController
 @Tag(name = "고객", description = "Person Related API")
 @RequestMapping(value = "/rest/person")
@@ -38,6 +36,8 @@ public class PersonController {
 	
 	@Resource
 	private PersonService personSvc;
+	@Resource
+	private LoginService loginSvc;
 	
 	@RequestMapping(value = "/signUp", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "회원가입", notes = "회원가입을 위한 API.")
@@ -77,8 +77,12 @@ public class PersonController {
 			if (resPerson == null) {
 				return ExceptionUtils.setException(errors, 500, "로그인에 실패했습니다.", header);
 			}
+
+			// token set
+			String token = loginSvc.setToken(resPerson.getPersonId());
+
 			success.setSuccessCode(200);
-			success.setSuccessMsg("Access Token: " + resPerson.getPersonId());
+			success.setSuccessMsg("access token: " + token);
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
@@ -86,20 +90,21 @@ public class PersonController {
 		return new ResponseEntity<SuccessMsg>(success, header, HttpStatus.valueOf(200));
 	}
 	
-	@RequestMapping(value = "/logout", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/logout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "로그아웃", notes = "로그아웃을 위한 API.")
 	@ApiResponses({
-		@ApiResponse(code = 200, message = "성공", response = Person.class),
+		@ApiResponse(code = 200, message = "성공", response = SuccessMsg.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> logout (HttpServletResponse response) throws Exception {
+	public ResponseEntity<?> logout (HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		SuccessMsg success = new SuccessMsg();
+		String token = request.getHeader("Authorization");
 		
 		try {
-			// cart cookie 삭제
-			deleteCookie("cart", response);
+			// token delete
+			loginSvc.deleteToken(token);
 			
 			success.setSuccessCode(200);
 			success.setSuccessMsg("로그아웃 되었습니다.");
@@ -126,7 +131,9 @@ public class PersonController {
 			Person person = personSvc.personSearch("personname", personName);	
 			
 			// 검색해 온 person 객체가 회원의 정보인지 확인
-			if (person.getPersonId() != Long.valueOf(token)) {
+			long personId = loginSvc.getLoginValue(token);
+			
+			if (person.getPersonId() != personId) {
 				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
 			}
 			return new ResponseEntity<Person>(person, header, HttpStatus.valueOf(200));
@@ -142,20 +149,17 @@ public class PersonController {
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
 	public ResponseEntity<?> partyAddressAdd (@Parameter(name = "주소 정보", required = true) @RequestBody Address address,
-		HttpServletRequest request) {
+			HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		String token = request.getHeader("Authorization");
 
 		Person person = new Person();
 		try {
-			// 유효한 token(personId)인지 확인
-			if (!personSvc.personIdCheck(token)) {
-				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
-			}
+			long personId = loginSvc.getLoginValue(token);
 			
-			if (personSvc.partyAddressWrite(Long.valueOf(token), address.getAddressId())) {
-				person = personSvc.personSearch("personid", token);
+			if (personSvc.partyAddressWrite(personId, address.getAddressId())) {
+				person = personSvc.personSearch("personid", "" + personId);
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -171,20 +175,17 @@ public class PersonController {
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
 	public ResponseEntity<?> partyAddressDelete (@Parameter(name = "주소 정보", required = true) @RequestBody Address address,
-		HttpServletRequest request) {
+			HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		String token = request.getHeader("Authorization");
-
+		
 		Person person = new Person();
 		try {
-			// 유효한 token(personId)인지 확인
-			if (!personSvc.personIdCheck(token)) {
-				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
-			}
+			long personId = loginSvc.getLoginValue(token);
 			
-			if (personSvc.partyAddressDelete(Long.valueOf(token), address.getAddressId())) {
-				person = personSvc.personSearch("personid", token);
+			if (personSvc.partyAddressDelete(personId, address.getAddressId())) {
+				person = personSvc.personSearch("personid", "" + personId);
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -207,13 +208,10 @@ public class PersonController {
 
 		Person person = new Person();
 		try {
-			// 유효한 token(personId)인지 확인
-			if (!personSvc.personIdCheck(token)) {
-				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
-			}
+			long personId = loginSvc.getLoginValue(token);
 			
-			if (personSvc.partyPhoneWrite(Long.valueOf(token), phone.getPhoneId())) {
-				person = personSvc.personSearch("personid", token);
+			if (personSvc.partyPhoneWrite(personId, phone.getPhoneId())) {
+				person = personSvc.personSearch("personid", "" + personId);
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -236,13 +234,10 @@ public class PersonController {
 
 		Person person = new Person();
 		try {
-			// 유효한 token(personId)인지 확인
-			if (!personSvc.personIdCheck(token)) {
-				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
-			}
+			long personId = loginSvc.getLoginValue(token);
 			
-			if (personSvc.partyPhoneDelete(Long.valueOf(token), phone.getPhoneId())) {
-				person = personSvc.personSearch("personid", token);
+			if (personSvc.partyPhoneDelete(personId, phone.getPhoneId())) {
+				person = personSvc.personSearch("personid", "" + personId);
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);

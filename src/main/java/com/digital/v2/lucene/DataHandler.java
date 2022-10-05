@@ -93,6 +93,29 @@ public class DataHandler {	// lucene 레퍼지토리 정보
 		return true;
 	}
 	
+	public static boolean delete(Term deleteTerm) throws Exception {
+
+		try {
+			IndexWriterConfig config = new IndexWriterConfig(new StandardAnalyzer());
+			IndexWriter writer = new IndexWriter(dir, config);
+			
+			TermQuery termQuery = new TermQuery(deleteTerm);
+
+			BooleanQuery wordQuery = new BooleanQuery.Builder()
+				.add(termQuery, Occur.MUST)
+				.build();
+			
+			writer.deleteDocuments(wordQuery);
+			writer.commit();
+			writer.flush();			
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return true;
+	}
+	
 	public static boolean delete(Term term1, Term term2) throws Exception {
 
 		try {

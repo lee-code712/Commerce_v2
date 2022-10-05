@@ -189,18 +189,6 @@ public class PersonService {
 		}
 	}
 	
-	/* 회원 ID (token) 유효성 검사 */
-	public boolean personIdCheck (String token) throws Exception {
-		
-		String key = "personid";
-		String value = token;
-
-		if (findHardly(key, value) != null) {
-			return true;
-		}
-		return false;
-	}
-	
 	public List<Document> setPluralDoc (Person person) {
 
 		List<Document> docList = new ArrayList<Document>();

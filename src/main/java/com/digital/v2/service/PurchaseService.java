@@ -73,10 +73,10 @@ public class PurchaseService {
 	}
 	
 	/* 장바구니 상품 일괄 구매 서비스 */
-	public boolean purchaseInCart (List<String> cartValueList, Purchase purchase) throws Exception {
+	public boolean purchaseInCart (Purchase purchase) throws Exception {
 		
 		try {
-			Cart cart = cartSvc.setCart(cartValueList);
+			Cart cart = cartSvc.cartSearch(purchase.getPersonId());
 			
 			// 장바구니 상품들의 구매 수량 유효성 검사
 			String errorMsg = "아래 상품들의 재고 수량이 부족합니다.\n";
@@ -106,6 +106,9 @@ public class PurchaseService {
 				inventory.setQuantity(inventory.getQuantity() - Long.valueOf(doc.get("purchasenumber")));
 				inventorySvc.inventoryUpdate(inventory);
 			}
+			
+			// 장바구니 일괄 삭제
+			cartSvc.cartDelete(purchase.getPersonId());
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -113,9 +116,9 @@ public class PurchaseService {
 	}
 	
 	/* 구매 검색 서비스 */
-	public List<Purchase> purchaseSearch (String token, String key, String value) {
+	public List<Purchase> purchaseSearch (String personId, String key, String value) {
 		
-		Term term1 = new Term("purchasepersonid", token);
+		Term term1 = new Term("purchasepersonid", personId);
 		Term term2 = new Term(key, value);
 		
 		List<Document> purchaseDocList = findListHardly(term1, term2);
@@ -140,7 +143,7 @@ public class PurchaseService {
 	}
 
 	/* 구매 상세 검색 서비스 */
-	public PurchaseList purchaseDetailSearch (String token, String key, String value) throws Exception {
+	public PurchaseList purchaseDetailSearch (String personId, String key, String value) throws Exception {
 		
 		List<Document> purchaseDocList = wildCardQuery(key, value);
 		
@@ -149,7 +152,7 @@ public class PurchaseService {
 		for (Document purchaseDoc : purchaseDocList) {
 			
 			PurchaseDetail purchase = new PurchaseDetail();
-			if (purchaseDoc != null && purchaseDoc.get("purchasepersonid").equals(token)) {
+			if (purchaseDoc != null && purchaseDoc.get("purchasepersonid").equals(personId)) {
 				
 				// purchase set
 				purchase.setPersonId(Long.parseLong(purchaseDoc.get("purchasepersonid")));

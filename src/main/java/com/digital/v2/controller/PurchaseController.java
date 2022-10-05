@@ -1,8 +1,5 @@
 package com.digital.v2.controller;
 
-import static com.digital.v2.utils.CookieUtils.getValueList;
-import static com.digital.v2.utils.CookieUtils.deleteCookie;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -26,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.digital.v2.schema.ErrorMsg;
 import com.digital.v2.schema.Purchase;
 import com.digital.v2.schema.PurchaseList;
-import com.digital.v2.service.PersonService;
+import com.digital.v2.service.LoginService;
 import com.digital.v2.service.PurchaseService;
 import com.digital.v2.utils.ExceptionUtils;
 
@@ -44,7 +41,7 @@ public class PurchaseController {
 	@Resource
 	PurchaseService purchaseSvc;
 	@Resource
-	PersonService personSvc;
+	LoginService loginSvc;
 	
 	@RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "상품 구매", notes = "상품을 구매하기 위한 API.")
@@ -60,15 +57,12 @@ public class PurchaseController {
 
 		List<Purchase> resPurchases = new ArrayList<Purchase>();
 		try {
-			// 유효한 token(personId)인지 확인
-			if (!personSvc.personIdCheck(token)) {
-				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
-			}
+			long personId = loginSvc.getLoginValue(token);
 			
-			purchase.setPersonId(Long.valueOf(token));
+			purchase.setPersonId(personId);
 			purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
 			if (purchaseSvc.purchase(purchase)) {
-				resPurchases = purchaseSvc.purchaseSearch(token, "purchasedate", purchase.getPurchaseDate());
+				resPurchases = purchaseSvc.purchaseSearch("" + personId, "purchasedate", purchase.getPurchaseDate());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -91,20 +85,12 @@ public class PurchaseController {
 
 		List<Purchase> resPurchases = new ArrayList<Purchase>();
 		try {
-			// 유효한 token(personId)인지 확인
-			if (!personSvc.personIdCheck(token)) {
-				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
-			}
+			long personId = loginSvc.getLoginValue(token);
 			
-			List<String> cartValueList = getValueList("cart", request);	// cart cookie 값 가져오기
-			
-			if (cartValueList != null) {		
-				purchase.setPersonId(Long.valueOf(token));
-				purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
-				if (purchaseSvc.purchaseInCart(cartValueList, purchase)) {
-					resPurchases = purchaseSvc.purchaseSearch(token, "purchasedate", purchase.getPurchaseDate());
-					deleteCookie("cart", response);	// 구매 성공 시 cart cookie 삭제
-				}
+			purchase.setPersonId(personId);
+			purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+			if (purchaseSvc.purchaseInCart(purchase)) {
+				resPurchases = purchaseSvc.purchaseSearch("" + personId, "purchasedate", purchase.getPurchaseDate());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -126,12 +112,9 @@ public class PurchaseController {
 		String token = request.getHeader("Authorization");
 		
 		try {
-			// 유효한 token(personId)인지 확인
-			if (!personSvc.personIdCheck(token)) {
-				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
-			}
+			long personId = loginSvc.getLoginValue(token);
 			
-			PurchaseList purchases = purchaseSvc.purchaseDetailSearch(token, "purchasedate", keyword);
+			PurchaseList purchases = purchaseSvc.purchaseDetailSearch("" + personId, "purchasedate", keyword);
 			return new ResponseEntity<PurchaseList>(purchases, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
