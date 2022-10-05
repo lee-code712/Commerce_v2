@@ -27,7 +27,7 @@ import org.apache.lucene.util.QueryBuilder;
 public class DataHandler {	// lucene 레퍼지토리 정보
 
 	static String flag = "";
-	private static final File fileIndex = new File("C:/Users/qlvhf/git/Commerce/index/");
+	private static final File fileIndex = new File("C:/Users/unipoint/eclipse-workspace/Commerce_v2/index/");
 	private static Directory dir = null;
 	
 	static {

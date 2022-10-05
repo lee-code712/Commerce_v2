@@ -1,9 +1,11 @@
 package com.digital.v2.service;
 
-import static com.digital.v2.lucene.DataHandler.findListHardly;
 import static com.digital.v2.lucene.DataHandler.wildCardQuery;
+import static com.digital.v2.lucene.DataHandler.findListHardly;
 import static com.digital.v2.lucene.DataHandler.write;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +61,11 @@ public class PurchaseService {
 			purchaseDoc.add(new TextField("purchasedate", "" + purchase.getPurchaseDate(), Store.YES));
 			
 			write(purchaseDoc);
+			
+			// 상품의 재고 수량 update
+			Inventory inventory = inventorySvc.inventorySearchByProduct("productid", "" + purchase.getProductId());
+			inventory.setQuantity(inventory.getQuantity() - Long.valueOf(purchase.getPurchaseNumber()));
+			inventorySvc.inventoryUpdate(inventory);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -110,6 +117,7 @@ public class PurchaseService {
 		
 		Term term1 = new Term("purchasepersonid", token);
 		Term term2 = new Term(key, value);
+		
 		List<Document> purchaseDocList = findListHardly(term1, term2);
 		
 		List<Purchase> purchaseList = new ArrayList<Purchase>();
@@ -123,9 +131,9 @@ public class PurchaseService {
 				purchase.setAddressId(Long.parseLong(purchaseDoc.get("purchaseaddressid")));
 				purchase.setPhoneId(Long.parseLong(purchaseDoc.get("purchasephoneid")));
 				purchase.setPurchaseDate(purchaseDoc.get("purchasedate"));
+				
+				purchaseList.add(purchase);
 			}
-			
-			purchaseList.add(purchase);
 		}
 
 		return purchaseList;
@@ -146,7 +154,10 @@ public class PurchaseService {
 				// purchase set
 				purchase.setPersonId(Long.parseLong(purchaseDoc.get("purchasepersonid")));
 				purchase.setPurchaseNumber(Long.parseLong(purchaseDoc.get("purchasenumber")));
-				purchase.setPurchaseDate(purchaseDoc.get("purchasedate"));
+
+				LocalDateTime purchaseDate = LocalDateTime.parse((String) purchaseDoc.get("purchasedate"), 
+						DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+				purchase.setPurchaseDate(purchaseDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 				
 				// product set
 				Product product = productSvc.productSearch("productid", purchaseDoc.get("purchaseproductid"));

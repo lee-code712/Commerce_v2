@@ -66,7 +66,7 @@ public class PurchaseController {
 			}
 			
 			purchase.setPersonId(Long.valueOf(token));
-			purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd HHmmss")));
+			purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
 			if (purchaseSvc.purchase(purchase)) {
 				resPurchases = purchaseSvc.purchaseSearch(token, "purchasedate", purchase.getPurchaseDate());
 			}
@@ -100,7 +100,7 @@ public class PurchaseController {
 			
 			if (cartValueList != null) {		
 				purchase.setPersonId(Long.valueOf(token));
-				purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd HH:mm:ss")));
+				purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
 				if (purchaseSvc.purchaseInCart(cartValueList, purchase)) {
 					resPurchases = purchaseSvc.purchaseSearch(token, "purchasedate", purchase.getPurchaseDate());
 					deleteCookie("cart", response);	// 구매 성공 시 cart cookie 삭제
