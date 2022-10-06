@@ -21,7 +21,7 @@ public class InventoryService {
 	@Resource
 	ProductService productSvc;
 
-	/* 재고 등록 서비스 - 재고가 등록되어 있는 경우 재고 변경 서비스 호출 */
+	/* 재고 등록 */
 	public boolean inventoryWrite (Inventory inventory) throws Exception {
 		
 		try {
@@ -45,7 +45,7 @@ public class InventoryService {
 		}
 	}
 	
-	/* 재고 변경 서비스 */
+	/* 재고 변경 */
 	public boolean inventoryUpdate (Inventory inventory) throws Exception {
 		
 		try {
@@ -62,7 +62,7 @@ public class InventoryService {
 		}
 	}
 	
-	/* 재고 검색 서비스 */
+	/* 재고 검색 */
 	public Inventory inventorySearch (String key, String value) throws Exception {
 		
 		Document doc = findHardly(key, value);
@@ -76,7 +76,7 @@ public class InventoryService {
 		return inventory;
 	}
 	
-	/* 상품 정보를 이용한 재고 검색 서비스 */
+	/* 상품 정보를 이용한 재고 검색 */
 	public Inventory inventorySearchByProduct (String productKey, String productValue) throws Exception {
 		
 		String key = "inventoryid";
@@ -107,7 +107,7 @@ public class InventoryService {
 			
 			if (inventory.getInventoryId() == 0) {
 				throw new Exception("아직 재고를 등록하지 않은 상품입니다.");
-			}		
+			}
 			if (inventory.getQuantity() - quantity < 0) {
 				return false;
 			}	

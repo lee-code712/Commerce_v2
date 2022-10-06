@@ -33,7 +33,7 @@ public class InventoryController {
 	InventoryService inventorySvc;
 	
 	@RequestMapping(value = "/manage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "재고 관리", notes = "특정 상품의 재고를 관리하기 위한 API.")
+	@ApiOperation(value = "재고 관리", notes = "특정 상품의 재고를 관리하기 위한 API. *입력 필드: inventoryId, quantity")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Inventory.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)

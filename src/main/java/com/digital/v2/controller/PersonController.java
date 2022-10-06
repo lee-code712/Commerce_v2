@@ -40,7 +40,7 @@ public class PersonController {
 	private AuthService authSvc;
 	
 	@RequestMapping(value = "/signUp", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "회원가입", notes = "회원가입을 위한 API.")
+	@ApiOperation(value = "회원가입", notes = "회원가입을 위한 API. *입력 필드: personName, password, gender, phoneNumber(s), addressDetail(s)")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
@@ -62,12 +62,12 @@ public class PersonController {
 	}
 	
 	@RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "로그인", notes = "로그인을 위한 API.")
+	@ApiOperation(value = "로그인", notes = "로그인을 위한 API. *입력 필드: personName, password")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = SuccessMsg.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> login (@Parameter(name = "계정 정보", required = true) @RequestBody Person person) {
+	public ResponseEntity<?> login (@Parameter(name = "로그인 정보", required = true) @RequestBody Person person) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		SuccessMsg success = new SuccessMsg();
@@ -78,7 +78,7 @@ public class PersonController {
 				return ExceptionUtils.setException(errors, 500, "로그인에 실패했습니다.", header);
 			}
 
-			// token set
+			// token 생성
 			String token = authSvc.setToken(resPerson.getPersonId());
 
 			success.setSuccessCode(200);
@@ -100,10 +100,10 @@ public class PersonController {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		SuccessMsg success = new SuccessMsg();
-		String token = request.getHeader("Authorization");
 		
 		try {
-			// token delete
+			// token 삭제
+			String token = request.getHeader("Authorization");
 			authSvc.deleteToken(token);
 			
 			success.setSuccessCode(200);
@@ -125,12 +125,11 @@ public class PersonController {
 			HttpServletRequest request) throws Exception {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
-		String token = request.getHeader("Authorization");
 		
 		try {
 			Person person = personSvc.personSearch("personname", personName);	
 			
-			// 검색해 온 person 객체가 회원의 정보인지 확인
+			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
 			
 			if (person.getPersonId() != personId) {
@@ -143,7 +142,7 @@ public class PersonController {
 	}
 	
 	@RequestMapping(value = "/partyAddress/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "회원 주소 추가", notes = "회원의 주소 정보를 추가로 등록하기 위한 API.")
+	@ApiOperation(value = "회원 주소 추가", notes = "회원의 주소 정보를 추가하기 위한 API. *입력 필드: addressId")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
@@ -152,10 +151,10 @@ public class PersonController {
 			HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
-		String token = request.getHeader("Authorization");
-
+		
 		Person person = new Person();
 		try {
+			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
 			
 			if (personSvc.partyAddressWrite(personId, address.getAddressId())) {
@@ -169,7 +168,7 @@ public class PersonController {
 	}
 	
 	@RequestMapping(value = "/partyAddress/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "회원 주소 삭제", notes = "회원의 특정 주소 정보를 삭제하기 위한 API.")
+	@ApiOperation(value = "회원 주소 삭제", notes = "회원의 특정 주소 정보를 삭제하기 위한 API. *입력 필드: addressId")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
@@ -178,10 +177,10 @@ public class PersonController {
 			HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
-		String token = request.getHeader("Authorization");
 		
 		Person person = new Person();
 		try {
+			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
 			
 			if (personSvc.partyAddressDelete(personId, address.getAddressId())) {
@@ -195,7 +194,7 @@ public class PersonController {
 	}
 
 	@RequestMapping(value = "/partyPhone/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "회원 전화번호 추가", notes = "회원의 전화번호 정보를 추가로 등록하기 위한 API.")
+	@ApiOperation(value = "회원 전화번호 추가", notes = "회원의 전화번호 정보를 추가하기 위한 API. *입력 필드: phoneId")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
@@ -204,10 +203,10 @@ public class PersonController {
 		HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
-		String token = request.getHeader("Authorization");
 
 		Person person = new Person();
 		try {
+			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
 			
 			if (personSvc.partyPhoneWrite(personId, phone.getPhoneId())) {
@@ -221,7 +220,7 @@ public class PersonController {
 	}
 	
 	@RequestMapping(value = "/partyPhone/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "회원 전화번호 삭제", notes = "회원의 특정 전화번호 정보를 삭제하기 위한 API.")
+	@ApiOperation(value = "회원 전화번호 삭제", notes = "회원의 특정 전화번호 정보를 삭제하기 위한 API. *입력 필드: phoneId")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
@@ -230,10 +229,10 @@ public class PersonController {
 		HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
-		String token = request.getHeader("Authorization");
 
 		Person person = new Person();
 		try {
+			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
 			
 			if (personSvc.partyPhoneDelete(personId, phone.getPhoneId())) {

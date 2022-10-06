@@ -34,7 +34,7 @@ public class ProductController {
 	ProductService productSvc;
 	
 	@RequestMapping(value = "/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "상품 등록", notes = "상품 등록을 위한 API.")
+	@ApiOperation(value = "상품 등록", notes = "상품 등록을 위한 API. *입력 필드: categoryId, price, productName")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Product.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)

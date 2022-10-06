@@ -28,7 +28,7 @@ public class PersonService {
 	@Resource
 	PhoneService phoneSvc;
 
-	/* 회원가입 서비스 */
+	/* 회원 등록 */
 	public boolean signUp (Person person) throws Exception {
 		
 		try {
@@ -50,7 +50,7 @@ public class PersonService {
 		}
 	}
 	
-	/* 로그인 서비스 */
+	/* 회원 로그인 정보 확인 */
 	public Person login (Person person) throws Exception {
 		
 		Person findPerson = personSearch("personname", person.getPersonName());
@@ -65,7 +65,7 @@ public class PersonService {
 		return findPerson;
 	}
 	
-	/* 회원 검색 서비스 */
+	/* 회원 검색 */
 	public Person personSearch (String key, String value) throws Exception {
 		
 		Document personDoc = findHardly(key, value);
@@ -105,7 +105,7 @@ public class PersonService {
 		return person;
 	}
 	
-	/* 회원 주소 등록 서비스 */
+	/* 회원 주소 등록 */
 	public boolean partyAddressWrite (long personId, long addressId) throws Exception {
 
 		try {
@@ -127,7 +127,7 @@ public class PersonService {
 		}
 	}
 	
-	/* 회원 주소 삭제 서비스 */
+	/* 회원 주소 삭제 */
 	public boolean partyAddressDelete (long personId, long addressId) throws Exception {
 		
 		try {
@@ -147,7 +147,7 @@ public class PersonService {
 		}
 	}
 	
-	/* 회원 전화번호 등록 서비스 */
+	/* 회원 전화번호 등록 */
 	public boolean partyPhoneWrite (long personId, long phoneId) throws Exception {
 
 		try {
@@ -169,7 +169,7 @@ public class PersonService {
 		}
 	}
 	
-	/* 회원 전화번호 삭제 서비스 */
+	/* 회원 전화번호 삭제 */
 	public boolean partyPhoneDelete (long personId, long phoneId) throws Exception {
 		
 		try {

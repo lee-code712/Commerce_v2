@@ -24,7 +24,7 @@ public class ProductService {
 	@Resource
 	CategoryService categorySvc;
 	
-	/* 상품 등록 서비스 */
+	/* 상품 등록 */
 	public boolean productWrite (Product product) throws Exception {
 		
 		try {
@@ -51,7 +51,7 @@ public class ProductService {
 		}
 	}
 
-	/* 상품 검색 서비스 */
+	/* 상품 검색 */
 	public Product productSearch (String key, String value) throws Exception {
 		
 		Document productDoc = findHardly(key, value);
@@ -68,7 +68,7 @@ public class ProductService {
 		return product;
 	}
 
-	/* 키워드를 이용한 상품 검색 서비스 */
+	/* 키워드를 이용한 상품 검색 */
 	public ProductList productSearchByKeyword (String key, String value) throws Exception {
 		
 		List<Document> productDocList = wildCardQuery(key, value);
@@ -94,7 +94,7 @@ public class ProductService {
 		return productList;
 	}
 	
-	/* 카테고리 정보를 이용한 상품 검색 서비스 */
+	/* 카테고리 정보를 이용한 상품 검색 */
 	public ProductList productSearchByCategory (String categoryKey, String categoryValue) throws Exception {
 		
 		String key = "productcategoryid";

@@ -33,7 +33,7 @@ public class CategoryController {
 	CategoryService categorySvc;
 
 	@RequestMapping(value = "/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "카테고리 등록", notes = "카테고리 등록을 위한 API.")
+	@ApiOperation(value = "카테고리 등록", notes = "카테고리 등록을 위한 API. *입력 필드: categoryName")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Category.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
