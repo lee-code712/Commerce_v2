@@ -202,8 +202,8 @@ public class OrderService {
 
 		List<CartProduct> products = new ArrayList<CartProduct>();
 		for (Document orderProductDoc : orderProductDocList) {
-			CartProduct orderProduct = new CartProduct();
 			
+			CartProduct orderProduct = new CartProduct();
 			orderProduct.setProductId(Long.parseLong(orderProductDoc.get("orderproductid")));
 			orderProduct.setQuantity(Long.parseLong(orderProductDoc.get("orderquantity")));
 			
@@ -220,10 +220,9 @@ public class OrderService {
 
 		List<CartProductDetail> products = new ArrayList<CartProductDetail>();
 		for (Document orderProductDoc : orderProductDocList) {
+			
 			CartProductDetail orderProduct = new CartProductDetail();
-			
 			orderProduct.setQuantity(Long.parseLong(orderProductDoc.get("orderquantity")));
-			
 			// product set
 			Product product = productSvc.productSearch("productid", orderProductDoc.get("orderproductid"));
 			orderProduct.setProduct(product);
@@ -241,8 +240,10 @@ public class OrderService {
 		
 		PurchaseDetail purchase = new PurchaseDetail();
 		if (purchaseDoc != null) {
-			
-			purchase.setPurchaseDate(purchaseDoc.get("purchasedate"));
+			// purchase date set
+			LocalDateTime purchaseDate = LocalDateTime.parse((String) purchaseDoc.get("purchasedate"), 
+					DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+			purchase.setPurchaseDate(purchaseDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 			
 			// order set
 			OrderSheetDetail order = new OrderSheetDetail();
@@ -280,7 +281,7 @@ public class OrderService {
 			if (purchaseDoc.get("purchasepersonid").equals(personId)) {
 				
 				PurchaseDetail purchase = new PurchaseDetail();
-
+				// purchase date set
 				LocalDateTime purchaseDate = LocalDateTime.parse((String) purchaseDoc.get("purchasedate"), 
 						DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 				purchase.setPurchaseDate(purchaseDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
@@ -320,7 +321,6 @@ public class OrderService {
 		
 		// order sheet doc add
 		Document orderSheetDoc = new Document();
-		
 		orderSheetDoc.add(new TextField("ordersheetid", "" + orderSheet.getOrderSheetId(), Store.YES));
 		orderSheetDoc.add(new TextField("ordersheetpersonid", "" + orderSheet.getPersonId(), Store.YES));
 		orderSheetDoc.add(new TextField("ordersheetphoneid", "" + orderSheet.getPhoneId(), Store.YES));
@@ -331,8 +331,8 @@ public class OrderService {
 		// order product doc add
 		List<CartProduct> products = orderSheet.getProducts();
 		for (CartProduct product : products) {
-			Document productDoc = new Document();
 			
+			Document productDoc = new Document();
 			productDoc.add(new TextField("orderid", "" + orderSheet.getOrderSheetId(), Store.YES));
 			productDoc.add(new TextField("orderproductid", "" + product.getProductId(), Store.YES));
 			productDoc.add(new TextField("orderquantity", "" + product.getQuantity(), Store.YES));
