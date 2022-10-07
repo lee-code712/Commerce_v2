@@ -128,7 +128,7 @@ public class OrderController {
 	}
 	
 	@RequestMapping(value = "/purchase", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "구매", notes = "가주문서에 있는 상품 목록을 구매하기 위한 API. *입력 필드: orderSheetId")
+	@ApiOperation(value = "결제", notes = "가주문서에 있는 상품 목록을 구매하기 위한 API. *입력 필드: orderSheetId")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = List.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
@@ -155,7 +155,7 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/inquiry/{keyword}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "구매 목록 검색", notes = "키워드를 포함하는 구매 날짜로 구매 목록을 검색하는 API.")
+	@ApiOperation(value = "구매내역 검색", notes = "키워드를 포함하는 구매 날짜로 구매 목록을 검색하는 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = PurchaseList.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
