@@ -38,7 +38,7 @@ public class CartController {
 	AuthService authSvc;
 
 	@RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "장바구니 상품 추가", notes = "특정 상품을 장바구니에 추가하기 위한 API.")
+	@ApiOperation(value = "장바구니 상품 추가", notes = "특정 상품을 장바구니에 추가하기 위한 API. *입력 필드: productId, purchaseNumber")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Cart.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
@@ -47,15 +47,14 @@ public class CartController {
 			HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
-		String token = request.getHeader("Authorization");
 		
 		Cart cart = new Cart();
 		try {
+			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
-			
-			cartProduct.setPersonId(personId);
-			if (cartSvc.cartProductWrite(cartProduct)) {
-				cart = cartSvc.cartSearch(cartProduct.getPersonId());
+
+			if (cartSvc.cartProductWrite(personId, cartProduct)) {
+				cart = cartSvc.cartSearch(personId);
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -65,7 +64,7 @@ public class CartController {
 	}
 	
 	@RequestMapping(value = "/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "장바구니 상품 삭제", notes = "특정 상품을 장바구니에서 삭제하기 위한 API.")
+	@ApiOperation(value = "장바구니 상품 삭제", notes = "특정 상품을 장바구니에서 삭제하기 위한 API. *입력 필드: productId, purchaseNumber")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Cart.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
@@ -74,15 +73,14 @@ public class CartController {
 			HttpServletRequest request, HttpServletResponse response) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
-		String token = request.getHeader("Authorization");
 		
 		Cart cart = new Cart();
 		try {
+			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
 			
-			cartProduct.setPersonId(personId);
-			if (cartSvc.cartProductDelete(cartProduct)) {
-				cart = cartSvc.cartSearch(cartProduct.getPersonId());
+			if (cartSvc.cartProductDelete(personId, cartProduct)) {
+				cart = cartSvc.cartSearch(personId);
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -100,9 +98,9 @@ public class CartController {
 	public ResponseEntity<?> cartLookUp (HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
-		String token = request.getHeader("Authorization");
 		
 		try {
+			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
 			
 			Cart cart = cartSvc.cartSearch(personId);

@@ -12,35 +12,34 @@ public class AuthService {
 
 	private static Map<String, Map<Long, Long>> tokenMap;
 	
-	// token 생성
+	/* token 생성 */
 	public synchronized String setToken (long personId) throws Exception {
-		
-		String token = "Auth" + System.currentTimeMillis();
 		
 		if (tokenMap == null) {
 			tokenMap = new HashMap<String, Map<Long, Long>>();
 		}
 		
+		// token map value set
 		Map<Long, Long> authMap = new HashMap<Long, Long>();
-		
 		long currentTime = System.currentTimeMillis();
 		authMap.put(personId, currentTime);
 		
+		// token 생성 & token map put
+		String token = "Auth" + System.currentTimeMillis();
 		tokenMap.put(token, authMap);
 		
 		return token;
 	}
 	
-	// token 삭제
+	/* token 삭제 */
 	public synchronized void deleteToken (String token) {
 		tokenMap.remove(token);
 	}
 	
-	// person id 반환
+	/* person id 반환 */
 	public long getPersonId (String token) {
 		
 		Map<Long, Long> authMap = tokenMap.get(token);
-		
 		Set<Long> set = authMap.keySet();
 		Iterator<Long> iterator = set.iterator();
 		
@@ -50,11 +49,10 @@ public class AuthService {
 		return 0;
 	}
 	
-	// token 유효 시간 갱신
+	/* token 유효 시간 갱신 */
 	public synchronized static void updateValidTime (String token) {
 		
 		Map<Long, Long> authMap = tokenMap.get(token);
-		
 		Set<Long> set = authMap.keySet();
 		Iterator<Long> iterator = set.iterator();
 		
@@ -67,7 +65,7 @@ public class AuthService {
 		}
 	}
 	
-	// token 유효 여부 확인
+	/* token 유효 여부 확인 */
 	public static boolean isValidToken (String token) {
 		
 		if (tokenMap != null && tokenMap.get(token) != null) {
@@ -76,11 +74,10 @@ public class AuthService {
 		return false;
 	}
 	
-	// token 만료 여부 확인
+	/* token 만료 여부 확인 */
 	public static boolean isExpiredToken (String token) {
 		
 		Map<Long, Long> authMap = tokenMap.get(token);
-		
 		Set<Long> set = authMap.keySet();
 		Iterator<Long> iterator = set.iterator();
 		

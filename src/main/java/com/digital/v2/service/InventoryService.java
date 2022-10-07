@@ -65,12 +65,12 @@ public class InventoryService {
 	/* 재고 검색 */
 	public Inventory inventorySearch (String key, String value) throws Exception {
 		
-		Document doc = findHardly(key, value);
+		Document inventoryDoc = findHardly(key, value);
 		
 		Inventory inventory = new Inventory();
-		if (doc != null) {
-			inventory.setInventoryId(Long.parseLong(doc.get("inventoryid")));
-			inventory.setQuantity(Long.parseLong(doc.get("quantity")));
+		if (inventoryDoc != null) {
+			inventory.setInventoryId(Long.parseLong(inventoryDoc.get("inventoryid")));
+			inventory.setQuantity(Long.parseLong(inventoryDoc.get("quantity")));
 		}
 		
 		return inventory;
@@ -88,11 +88,11 @@ public class InventoryService {
 		if (product.getProductName() != null) {
 			value = "" + product.getInventoryId();
 			
-			Document doc = findHardly(key, value);
+			Document inventoryDoc = findHardly(key, value);
 			
-			if (doc != null) {
-				inventory.setInventoryId(Long.parseLong(doc.get("inventoryid")));
-				inventory.setQuantity(Long.parseLong(doc.get("quantity")));
+			if (inventoryDoc != null) {
+				inventory.setInventoryId(Long.parseLong(inventoryDoc.get("inventoryid")));
+				inventory.setQuantity(Long.parseLong(inventoryDoc.get("quantity")));
 			}
 		}
 		

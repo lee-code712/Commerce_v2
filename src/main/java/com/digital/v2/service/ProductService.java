@@ -78,13 +78,11 @@ public class ProductService {
 		for (Document productDoc : productDocList) {
 			
 			Product product = new Product();
-			if (productDoc != null) {
-				product.setProductId(Long.parseLong(productDoc.get("productid")));
-				product.setPrice(Long.parseLong(productDoc.get("price")));
-				product.setProductName(productDoc.get("productname"));
-				product.setCategoryId(Long.parseLong(productDoc.get("productcategoryid")));
-				product.setInventoryId(Long.parseLong(productDoc.get("productinventoryid")));
-			}
+			product.setProductId(Long.parseLong(productDoc.get("productid")));
+			product.setPrice(Long.parseLong(productDoc.get("price")));
+			product.setProductName(productDoc.get("productname"));
+			product.setCategoryId(Long.parseLong(productDoc.get("productcategoryid")));
+			product.setInventoryId(Long.parseLong(productDoc.get("productinventoryid")));
 			
 			products.add(product);
 		}
@@ -110,15 +108,13 @@ public class ProductService {
 			
 			List<Product> products = new ArrayList<Product>();	
 			for (Document productDoc : productDocList) {
-	 
-				Product product = new Product();
-				if (productDoc != null) {
-					product.setProductId(Long.parseLong(productDoc.get("productid")));
-					product.setPrice(Long.parseLong(productDoc.get("price")));
-					product.setProductName(productDoc.get("productname"));
-					product.setCategoryId(Long.parseLong(productDoc.get("productcategoryid")));
-					product.setInventoryId(Long.parseLong(productDoc.get("productinventoryid")));
-				}
+				
+				Product product = new Product();		
+				product.setProductId(Long.parseLong(productDoc.get("productid")));
+				product.setPrice(Long.parseLong(productDoc.get("price")));
+				product.setProductName(productDoc.get("productname"));
+				product.setCategoryId(Long.parseLong(productDoc.get("productcategoryid")));
+				product.setInventoryId(Long.parseLong(productDoc.get("productinventoryid")));
 				
 				products.add(product);
 			}

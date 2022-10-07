@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 @ArraySchema
 public class PurchaseList {
 
-	@ApiModelProperty(required = false, position = 1, notes = "상품 구매 상세 리스트", example = "", dataType = "array")
+	@ApiModelProperty(required = false, position = 1, notes = "상품 구매 상세 목록", example = "", dataType = "array")
 	private List<PurchaseDetail> purchases;
 
 	public List<PurchaseDetail> getPurchases() {

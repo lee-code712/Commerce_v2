@@ -4,21 +4,21 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel
-public class CartProduct {
+public class CartProductDetail {
 	
-	@ApiModelProperty(required = true, position = 1, notes = "상품 ID", example = "0", dataType = "long")
-	private long productId;
-	
+	@ApiModelProperty(required = true, position = 1, notes = "상품 정보", example = "", dataType = "object")
+	private Product product;
+
 	@ApiModelProperty(required = true, position = 2, notes = "상품 수량", example = "0", dataType = "long")
 	private long quantity;
 
-	public long getProductId() {
-		long productId = this.productId;
-		return productId;
+	public Product getProduct() {
+		Product product = this.product;
+		return product;
 	}
-	
-	public void setProductId(long productId) {
-		this.productId = productId;
+
+	public void setProduct(Product product) {
+		this.product = product;
 	}
 
 	public long getQuantity() {

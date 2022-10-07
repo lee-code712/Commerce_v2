@@ -72,8 +72,6 @@ public class PersonService {
 		
 		Person person = new Person();
 		if (personDoc != null) {
-			
-			// person set
 			person.setPersonId(Long.parseLong(personDoc.get("personid")));
 			person.setPersonName(personDoc.get("personname"));
 			person.setPassword(personDoc.get("password"));
