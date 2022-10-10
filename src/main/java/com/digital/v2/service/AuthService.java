@@ -24,7 +24,7 @@ public class AuthService {
 		long currentTime = System.currentTimeMillis();
 		authMap.put(personId, currentTime);
 		
-		// token 생성 & token map put
+		// token set & token map put
 		String token = "Auth" + System.currentTimeMillis();
 		tokenMap.put(token, authMap);
 		
@@ -36,7 +36,7 @@ public class AuthService {
 		tokenMap.remove(token);
 	}
 	
-	/* person id 반환 */
+	/* person ID 반환 */
 	public long getPersonId (String token) {
 		
 		Map<Long, Long> authMap = tokenMap.get(token);

@@ -270,7 +270,7 @@ public class OrderService {
 	}
 	
 	/* 구매 목록 검색 */
-	public PurchaseList purchaseListSearch (String personId, String key, String value) throws Exception {
+	public PurchaseList purchaseListSearch (long personId, String key, String value) throws Exception {
 
 		List<Document> purchaseDocList = wildCardQuery(key, value);
 		
@@ -278,7 +278,7 @@ public class OrderService {
 		List<PurchaseDetail> purchaseList = new ArrayList<PurchaseDetail>();
 		for (Document purchaseDoc : purchaseDocList) {
 			
-			if (purchaseDoc.get("purchasepersonid").equals(personId)) {
+			if (purchaseDoc.get("purchasepersonid").equals("" + personId)) {
 				
 				PurchaseDetail purchase = new PurchaseDetail();
 				// purchase date set

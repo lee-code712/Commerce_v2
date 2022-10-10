@@ -2,7 +2,6 @@ package com.digital.v2.controller;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -130,7 +129,7 @@ public class OrderController {
 	@RequestMapping(value = "/purchase", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "결제", notes = "가주문서에 있는 상품 목록을 구매하기 위한 API. *입력 필드: orderSheetId")
 	@ApiResponses({
-		@ApiResponse(code = 200, message = "성공", response = List.class),
+		@ApiResponse(code = 200, message = "성공", response = PurchaseDetail.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
 	public ResponseEntity<?> purchase (@Parameter(name = "가주문서 정보", required = true) @RequestBody Purchase purchase,
@@ -169,7 +168,7 @@ public class OrderController {
 			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
 			
-			PurchaseList purchases = orderSvc.purchaseListSearch("" + personId, "purchasedate", keyword);
+			PurchaseList purchases = orderSvc.purchaseListSearch(personId, "purchasedate", keyword);
 			return new ResponseEntity<PurchaseList>(purchases, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
