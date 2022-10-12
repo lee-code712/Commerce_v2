@@ -25,7 +25,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         final String token = request.getHeader("Authorization");
         log.info("preHandle: " + token);
         
-        // token 값이 유효하지 않으면 401 에러 발생
+        // token 값이 유효하지 않으면 401 Unauthorized 에러
         if (!AuthService.isValidToken(token)) {
         	response.setContentType("application/json");
         	response.setCharacterEncoding("UTF-8");

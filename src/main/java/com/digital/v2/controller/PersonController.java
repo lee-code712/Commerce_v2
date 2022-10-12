@@ -90,7 +90,7 @@ public class PersonController {
 		return new ResponseEntity<SuccessMsg>(success, header, HttpStatus.valueOf(200));
 	}
 	
-	@RequestMapping(value = "/logout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/logout", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "로그아웃", notes = "로그아웃을 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = SuccessMsg.class),
