@@ -21,31 +21,20 @@ import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.index.Term;
 import org.springframework.stereotype.Component;
 
-import com.digital.v2.schema.Address;
 import com.digital.v2.schema.Inventory;
 import com.digital.v2.schema.OrderSheet;
-import com.digital.v2.schema.OrderSheetDetail;
-import com.digital.v2.schema.Phone;
-import com.digital.v2.schema.Product;
+import com.digital.v2.schema.Order;
 import com.digital.v2.schema.Purchase;
-import com.digital.v2.schema.PurchaseDetail;
-import com.digital.v2.schema.PurchaseList;
+import com.digital.v2.schema.OrderList;
 import com.digital.v2.schema.CartProduct;
-import com.digital.v2.schema.CartProductDetail;
 
 @Component
 public class OrderService {
 	
 	@Resource 
-	ProductService productSvc;
-	@Resource 
 	InventoryService inventorySvc;
 	@Resource
 	CartService cartSvc;
-	@Resource
-	PhoneService phoneSvc;
-	@Resource
-	AddressService addressSvc;
 	
 	/* 주문서 등록 */
 	public long orderSheetWrite (OrderSheet orderSheet) throws Exception {
@@ -92,6 +81,26 @@ public class OrderService {
 		}
 	}
 	
+	/* 주문서 삭제 */
+	public boolean orderSheetDelete (long personId) throws Exception {
+		
+		// order sheet 존재 여부 확인
+		OrderSheet orderSheet = orderSheetSearch("ordersheetpersonid", "" + personId);
+		if (orderSheet.getOrderSheetId() == 0) {
+			throw new Exception("현재 등록된 가주문서가 없습니다.");
+		}
+		
+		// 존재하면 delete
+		try {
+			Term deleteTerm = new Term("ordersheetid", "" + orderSheet.getOrderSheetId());
+			
+			delete(deleteTerm);
+			return true;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
 	/* 결제 */
 	public boolean purchase (long personId, Purchase purchase) throws Exception {
 
@@ -113,7 +122,7 @@ public class OrderService {
 			
 			write(purchaseDoc);
 			
-			// order product 관련 작업 처리
+			// order product 관련 처리
 			List<CartProduct> products = orderSheet.getProducts();
 			for (CartProduct product : products) {
 				// 재고 수량 update
@@ -128,20 +137,8 @@ public class OrderService {
 			}
 			
 			// 주문서 delete
-			orderSheetDelete(purchase.getOrderSheetId());
+			orderSheetDelete(orderSheet.getPersonId());
 			
-			return true;
-		} catch (Exception e) {
-			throw e;
-		}
-	}
-	
-	/* 주문서 삭제 */
-	public boolean orderSheetDelete (long orderSheetId) throws Exception {
-		try {
-			Term deleteTerm = new Term("ordersheetid", "" + orderSheetId);
-			
-			delete(deleteTerm);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -162,33 +159,6 @@ public class OrderService {
 			
 			// order product list set
 			List<CartProduct> products = orderProductSearch("orderid", "" + orderSheet.getOrderSheetId());
-			
-			orderSheet.setProducts(products);
-		}
-
-		return orderSheet;
-	}
-	
-	/* 주문서 상세 검색 */
-	public OrderSheetDetail orderSheetDetailSearch (String key, String value) throws Exception {
-		
-		Document ordersheetDoc = findHardly(key, value);
-		
-		OrderSheetDetail orderSheet = new OrderSheetDetail();
-		if (ordersheetDoc != null) {
-			orderSheet.setOrderSheetId(Long.parseLong(ordersheetDoc.get("ordersheetid")));
-			orderSheet.setPersonId(Long.parseLong(ordersheetDoc.get("ordersheetpersonid")));
-			
-			// phone set
-			Phone phone = phoneSvc.phoneSearch("phoneid", ordersheetDoc.get("ordersheetphoneid"));
-			orderSheet.setPhone(phone);
-			
-			// address set
-			Address address = addressSvc.addressSearch("addressid", ordersheetDoc.get("ordersheetaddressid"));
-			orderSheet.setAddress(address);
-			
-			// order product list set
-			List<CartProductDetail> products = orderProductDetailSearch("orderid", "" + orderSheet.getOrderSheetId());
 			orderSheet.setProducts(products);
 		}
 
@@ -202,7 +172,6 @@ public class OrderService {
 
 		List<CartProduct> products = new ArrayList<CartProduct>();
 		for (Document orderProductDoc : orderProductDocList) {
-			
 			CartProduct orderProduct = new CartProduct();
 			orderProduct.setProductId(Long.parseLong(orderProductDoc.get("orderproductid")));
 			orderProduct.setQuantity(Long.parseLong(orderProductDoc.get("orderquantity")));
@@ -213,106 +182,67 @@ public class OrderService {
 		return products;
 	}
 	
-	/* 주문 상품 상세 검색 */
-	public List<CartProductDetail> orderProductDetailSearch (String key, String value) throws Exception {
-		
-		List<Document> orderProductDocList = findListHardly(key, value);
-
-		List<CartProductDetail> products = new ArrayList<CartProductDetail>();
-		for (Document orderProductDoc : orderProductDocList) {
-			
-			CartProductDetail orderProduct = new CartProductDetail();
-			orderProduct.setQuantity(Long.parseLong(orderProductDoc.get("orderquantity")));
-			// product set
-			Product product = productSvc.productSearch("productid", orderProductDoc.get("orderproductid"));
-			orderProduct.setProduct(product);
-			
-			products.add(orderProduct);
-		}
-
-		return products;
-	}
-	
-	/* 구매 상세 검색 */
-	public PurchaseDetail purchaseDetailSearch (String key, String value) throws Exception {
+	/* 주문 검색 */
+	public Order orderSearch (String key, String value) throws Exception {
 
 		Document purchaseDoc = findHardly(key, value);
 		
-		PurchaseDetail purchase = new PurchaseDetail();
+		Order order = new Order();
 		if (purchaseDoc != null) {
+			// purchaseInfo set
+			OrderSheet orderInfo = new OrderSheet();
+			orderInfo.setOrderSheetId(Long.parseLong(purchaseDoc.get("purchaseid")));
+			orderInfo.setPersonId(Long.parseLong(purchaseDoc.get("purchasepersonid")));
+			orderInfo.setPhoneId(Long.parseLong(purchaseDoc.get("purchasephoneid")));
+			orderInfo.setAddressId(Long.parseLong(purchaseDoc.get("purchaseaddressid")));
+			// order product list set
+			List<CartProduct> products = orderProductSearch("orderid", "" + orderInfo.getOrderSheetId());
+			orderInfo.setProducts(products);
+			order.setPurchaseInfo(orderInfo);
+			
 			// purchase date set
 			LocalDateTime purchaseDate = LocalDateTime.parse((String) purchaseDoc.get("purchasedate"), 
 					DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-			purchase.setPurchaseDate(purchaseDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-			
-			// order set
-			OrderSheetDetail order = new OrderSheetDetail();
-			
-			order.setOrderSheetId(Long.parseLong(purchaseDoc.get("purchaseid")));
-			order.setPersonId(Long.parseLong(purchaseDoc.get("purchasepersonid")));
-			
-			// phone set
-			Phone phone = phoneSvc.phoneSearch("phoneid", purchaseDoc.get("purchasephoneid"));
-			order.setPhone(phone);
-			
-			// address set
-			Address address = addressSvc.addressSearch("addressid", purchaseDoc.get("purchaseaddressid"));
-			order.setAddress(address);
-			
-			// order product list set
-			List<CartProductDetail> products = orderProductDetailSearch("orderid", "" + order.getOrderSheetId());
-			order.setProducts(products);
-			
-			purchase.setOrder(order);
+			order.setPurchaseDate(purchaseDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		}
 
-		return purchase;
+		return order;
 	}
 	
-	/* 구매 목록 검색 */
-	public PurchaseList purchaseListSearch (long personId, String key, String value) throws Exception {
+	/* 키워드를 이용한 주문 목록 검색 */
+	public OrderList orderListSearch (long personId, String key, String value) throws Exception {
 
 		List<Document> purchaseDocList = wildCardQuery(key, value);
 		
-		PurchaseList purchases = new PurchaseList();
-		List<PurchaseDetail> purchaseList = new ArrayList<PurchaseDetail>();
+		OrderList orders = new OrderList();
+		List<Order> orderList = new ArrayList<Order>();
 		for (Document purchaseDoc : purchaseDocList) {
 			
 			if (purchaseDoc.get("purchasepersonid").equals("" + personId)) {
+				Order order = new Order();
+				// purchaseInfo set
+				OrderSheet orderInfo = new OrderSheet();
+				orderInfo.setOrderSheetId(Long.parseLong(purchaseDoc.get("purchaseid")));
+				orderInfo.setPersonId(Long.parseLong(purchaseDoc.get("purchasepersonid")));
+				orderInfo.setPhoneId(Long.parseLong(purchaseDoc.get("purchasephoneid")));
+				orderInfo.setAddressId(Long.parseLong(purchaseDoc.get("purchaseaddressid")));
+				// order product list set
+				List<CartProduct> products = orderProductSearch("orderid", "" + orderInfo.getOrderSheetId());
+				orderInfo.setProducts(products);
+				order.setPurchaseInfo(orderInfo);
 				
-				PurchaseDetail purchase = new PurchaseDetail();
 				// purchase date set
 				LocalDateTime purchaseDate = LocalDateTime.parse((String) purchaseDoc.get("purchasedate"), 
 						DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-				purchase.setPurchaseDate(purchaseDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+				order.setPurchaseDate(purchaseDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 				
-				// order set
-				OrderSheetDetail order = new OrderSheetDetail();
-				
-				order.setOrderSheetId(Long.parseLong(purchaseDoc.get("purchaseid")));
-				order.setPersonId(Long.parseLong(purchaseDoc.get("purchasepersonid")));
-				
-				// phone set
-				Phone phone = phoneSvc.phoneSearch("phoneid", purchaseDoc.get("purchasephoneid"));
-				order.setPhone(phone);
-				
-				// address set
-				Address address = addressSvc.addressSearch("addressid", purchaseDoc.get("purchaseaddressid"));
-				order.setAddress(address);
-				
-				// order product list set
-				List<CartProductDetail> products = orderProductDetailSearch("orderid", "" + order.getOrderSheetId());
-				order.setProducts(products);
-				
-				purchase.setOrder(order);
-				
-				purchaseList.add(purchase);
+				orderList.add(order);
 			}
 		}
 		
-		purchases.setPurchases(purchaseList);
+		orders.setOrders(orderList);
 
-		return purchases;
+		return orders;
 	}
 	
 	public List<Document> setOrderSheetPluralDoc (OrderSheet orderSheet) {
@@ -321,6 +251,7 @@ public class OrderService {
 		
 		// order sheet doc add
 		Document orderSheetDoc = new Document();
+		
 		orderSheetDoc.add(new TextField("ordersheetid", "" + orderSheet.getOrderSheetId(), Store.YES));
 		orderSheetDoc.add(new TextField("ordersheetpersonid", "" + orderSheet.getPersonId(), Store.YES));
 		orderSheetDoc.add(new TextField("ordersheetphoneid", "" + orderSheet.getPhoneId(), Store.YES));
@@ -331,8 +262,8 @@ public class OrderService {
 		// order product doc add
 		List<CartProduct> products = orderSheet.getProducts();
 		for (CartProduct product : products) {
-			
 			Document productDoc = new Document();
+			
 			productDoc.add(new TextField("orderid", "" + orderSheet.getOrderSheetId(), Store.YES));
 			productDoc.add(new TextField("orderproductid", "" + product.getProductId(), Store.YES));
 			productDoc.add(new TextField("orderquantity", "" + product.getQuantity(), Store.YES));

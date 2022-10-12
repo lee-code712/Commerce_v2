@@ -18,14 +18,10 @@ import org.springframework.stereotype.Component;
 
 import com.digital.v2.schema.Cart;
 import com.digital.v2.schema.CartProduct;
-import com.digital.v2.schema.CartProductDetail;
-import com.digital.v2.schema.Product;
 
 @Component
 public class CartService {
-
-	@Resource
-	ProductService productSvc;
+	
 	@Resource
 	InventoryService inventorySvc;
 
@@ -79,18 +75,6 @@ public class CartService {
 		}
 	}
 	
-	/* 장바구니 삭제 */
-	public boolean cartDelete (long personId) throws Exception {
-		try {
-			Term deleteTerm = new Term("cartpersonid", "" + personId);
-			
-			delete(deleteTerm);
-			return true;
-		} catch (Exception e) {
-			throw e;
-		}
-	}
-	
 	/* 장바구니 상품 검색 */
 	public CartProduct cartProductSearch (long personId, CartProduct cartProduct) throws Exception {
 		
@@ -119,7 +103,6 @@ public class CartService {
 		
 		List<CartProduct> cartProductList = new ArrayList<CartProduct>();
 		for (Document cartProductDoc : cartProductDocList) {
-			
 			cartProduct = new CartProduct();
 			cartProduct.setProductId(Long.parseLong(cartProductDoc.get("cartproductid")));
 			cartProduct.setQuantity(Long.parseLong(cartProductDoc.get("cartquantity")));
@@ -139,15 +122,12 @@ public class CartService {
 		List<Document> cartDoc = findListHardly(key, value);
 		
 		Cart cart = new Cart();
-		List<CartProductDetail> cartProductList = new ArrayList<CartProductDetail>();
+		List<CartProduct> cartProductList = new ArrayList<CartProduct>();
 		for (Document cartProductDoc : cartDoc) {
-
-			CartProductDetail cartProduct = new CartProductDetail();
+			CartProduct cartProduct = new CartProduct();
+			cartProduct.setProductId(Long.parseLong(cartProductDoc.get("cartproductid")));
 			cartProduct.setQuantity(Long.parseLong(cartProductDoc.get("cartquantity")));
-			// product set
-			Product product = productSvc.productSearch("productid", cartProductDoc.get("cartproductid"));
-			cartProduct.setProduct(product);
-			
+
 			cartProductList.add(cartProduct);
 		}
 		

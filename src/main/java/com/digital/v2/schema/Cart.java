@@ -9,14 +9,14 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 public class Cart {
 
 	@ApiModelProperty(required = true, position = 1, notes = "장바구니 상품 목록", example = "0", dataType = "array")
-	private List<CartProductDetail> cart;
+	private List<CartProduct> cart;
 
-	public List<CartProductDetail> getCart() {
-		List<CartProductDetail> cart = this.cart;
+	public List<CartProduct> getCart() {
+		List<CartProduct> cart = this.cart;
 		return cart;
 	}
 
-	public void setCart(List<CartProductDetail> cart) {
+	public void setCart(List<CartProduct> cart) {
 		this.cart = cart;
 	}
 	

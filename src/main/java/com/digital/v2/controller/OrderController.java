@@ -19,10 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.digital.v2.schema.ErrorMsg;
 import com.digital.v2.schema.OrderSheet;
-import com.digital.v2.schema.OrderSheetDetail;
+import com.digital.v2.schema.Order;
 import com.digital.v2.schema.Purchase;
-import com.digital.v2.schema.PurchaseDetail;
-import com.digital.v2.schema.PurchaseList;
+import com.digital.v2.schema.OrderList;
 import com.digital.v2.schema.SuccessMsg;
 import com.digital.v2.service.AuthService;
 import com.digital.v2.service.OrderService;
@@ -47,7 +46,7 @@ public class OrderController {
 	@RequestMapping(value = "/sheet/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "가주문서 등록", notes = "결제 전 가주문서 등록을 위한 API. *입력 필드: product(s), addressId, phoneId")
 	@ApiResponses({
-		@ApiResponse(code = 200, message = "성공", response = OrderSheetDetail.class),
+		@ApiResponse(code = 200, message = "성공", response = OrderSheet.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
 	public ResponseEntity<?> orderSheetWrite (@Parameter(name = "주문 정보", required = true) @RequestBody OrderSheet orderSheet,
@@ -55,7 +54,7 @@ public class OrderController {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 
-		OrderSheetDetail resOrderSheet = new OrderSheetDetail();
+		OrderSheet resOrderSheet = new OrderSheet();
 		try {
 			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
@@ -63,19 +62,19 @@ public class OrderController {
 			orderSheet.setPersonId(personId);
 			long orderId = orderSvc.orderSheetWrite(orderSheet);
 			if (orderId != 0) {
-				resOrderSheet = orderSvc.orderSheetDetailSearch("ordersheetid", "" + orderId);
+				resOrderSheet = orderSvc.orderSheetSearch("ordersheetid", "" + orderId);
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
 
-		return new ResponseEntity<OrderSheetDetail>(resOrderSheet, header, HttpStatus.valueOf(200));
+		return new ResponseEntity<OrderSheet>(resOrderSheet, header, HttpStatus.valueOf(200));
 	}
 	
 	@RequestMapping(value = "sheet/lookUp", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "가주문서 조회", notes = "등록한 가주문서를 확인하기 위한 API.")
+	@ApiOperation(value = "가주문서 조회", notes = "가주문서를 확인하기 위한 API.")
 	@ApiResponses({
-		@ApiResponse(code = 200, message = "성공", response = OrderSheetDetail.class),
+		@ApiResponse(code = 200, message = "성공", response = OrderSheet.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
 	public ResponseEntity<?> orderSheetLookUp (HttpServletRequest request) {
@@ -86,11 +85,11 @@ public class OrderController {
 			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
 			
-			OrderSheetDetail orderSheet = orderSvc.orderSheetDetailSearch("ordersheetpersonid", "" + personId);
+			OrderSheet orderSheet = orderSvc.orderSheetSearch("ordersheetpersonid", "" + personId);
 			if (orderSheet.getPersonId() == 0) {
 				return ExceptionUtils.setException(errors, 500, "현재 등록된 가주문서가 없습니다.", header);
 			}
-			return new ResponseEntity<OrderSheetDetail>(orderSheet, header, HttpStatus.valueOf(200));
+			return new ResponseEntity<OrderSheet>(orderSheet, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
@@ -111,14 +110,9 @@ public class OrderController {
 			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
 			
-			OrderSheet orderSheet = orderSvc.orderSheetSearch("ordersheetpersonid", "" + personId);
-			if (orderSheet.getPersonId() == 0) {
-				return ExceptionUtils.setException(errors, 500, "현재 등록된 가주문서가 없습니다.", header);
-			}
-			
-			if (orderSvc.orderSheetDelete(orderSheet.getOrderSheetId())) {
+			if (orderSvc.orderSheetDelete(personId)) {
 				success.setSuccessCode(200);
-				success.setSuccessMsg("가주문서 삭제가 완료되었습니다.");
+				success.setSuccessMsg("가주문서를 삭제했습니다.");
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -127,9 +121,9 @@ public class OrderController {
 	}
 	
 	@RequestMapping(value = "/purchase", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "결제", notes = "가주문서에 있는 상품 목록을 구매하기 위한 API. *입력 필드: orderSheetId")
+	@ApiOperation(value = "결제", notes = "가주문서에 있는 상품(들)을 결제하기 위한 API. *입력 필드: orderSheetId")
 	@ApiResponses({
-		@ApiResponse(code = 200, message = "성공", response = PurchaseDetail.class),
+		@ApiResponse(code = 200, message = "성공", response = Order.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
 	public ResponseEntity<?> purchase (@Parameter(name = "가주문서 정보", required = true) @RequestBody Purchase purchase,
@@ -137,29 +131,29 @@ public class OrderController {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
-		PurchaseDetail resPurchase = new PurchaseDetail();
+		Order order = new Order();
 		try {
 			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
 			
 			purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
 			if (orderSvc.purchase(personId, purchase)) {
-				resPurchase = orderSvc.purchaseDetailSearch("purchaseid", "" + purchase.getOrderSheetId());
+				order = orderSvc.orderSearch("purchaseid", "" + purchase.getOrderSheetId());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
 
-		return new ResponseEntity<PurchaseDetail>(resPurchase, header, HttpStatus.valueOf(200));
+		return new ResponseEntity<Order>(order, header, HttpStatus.valueOf(200));
 	}
 
 	@RequestMapping(value = "/inquiry/{keyword}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "구매내역 검색", notes = "키워드를 포함하는 구매 날짜로 구매 목록을 검색하는 API.")
+	@ApiOperation(value = "주문 목록 검색", notes = "키워드를 포함하는 결제 날짜로 주문 목록을 검색하는 API.")
 	@ApiResponses({
-		@ApiResponse(code = 200, message = "성공", response = PurchaseList.class),
+		@ApiResponse(code = 200, message = "성공", response = OrderList.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> purchaseSearch (@Parameter(name = "구매 날짜 키워드", required = true) @PathVariable String keyword, 
+	public ResponseEntity<?> orderSearchByKeyword (@Parameter(name = "결제 날짜 키워드", required = true) @PathVariable String keyword, 
 			HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
@@ -168,8 +162,8 @@ public class OrderController {
 			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
 			
-			PurchaseList purchases = orderSvc.purchaseListSearch(personId, "purchasedate", keyword);
-			return new ResponseEntity<PurchaseList>(purchases, header, HttpStatus.valueOf(200));
+			OrderList orders = orderSvc.orderListSearch(personId, "purchasedate", keyword);
+			return new ResponseEntity<OrderList>(orders, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}

@@ -1,25 +1,17 @@
+
 package com.digital.v2.schema;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel
-public class Purchase {
-
-	@ApiModelProperty(required = true, position = 1, notes = "주문서 ID", example = "0", dataType = "long")
-	private long orderSheetId;
+public class Order {
+	
+	@ApiModelProperty(required = false, position = 1, notes = "주문 정보", example = "0", dataType = "object")
+	private OrderSheet purchaseInfo;
 	
 	@ApiModelProperty(required = false, position = 2, notes = "결제 날짜", example = "yyyyMMddHHmmss", dataType = "string")
 	private String purchaseDate;
-
-	public long getOrderSheetId() {
-		long orderSheetId = this.orderSheetId;
-		return orderSheetId;
-	}
-
-	public void setOrderSheetId(long orderSheetId) {
-		this.orderSheetId = orderSheetId;
-	}
 
 	public String getPurchaseDate() {
 		String purchaseDate = this.purchaseDate;
@@ -28,6 +20,15 @@ public class Purchase {
 
 	public void setPurchaseDate(String purchaseDate) {
 		this.purchaseDate = purchaseDate;
+	}
+	
+	public OrderSheet getPurchaseInfo() {
+		OrderSheet purchaseInfo = this.purchaseInfo;
+		return purchaseInfo;
+	}
+
+	public void setPurchaseInfo(OrderSheet purchaseInfo) {
+		this.purchaseInfo = purchaseInfo;
 	}
 
 }

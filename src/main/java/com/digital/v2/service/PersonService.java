@@ -85,7 +85,6 @@ public class PersonService {
 				Address address = addressSvc.addressSearch("addressid", partyAddressDoc.get("partyaddressid"));
 				addressList.add(address);
 			}
-
 			person.setAddressList(addressList);
 			
 			// phone list set
@@ -96,7 +95,6 @@ public class PersonService {
 				Phone phone = phoneSvc.phoneSearch("phoneid", partyPhoneDoc.get("partyphoneid"));
 				phoneList.add(phone);
 			}
-
 			person.setPhoneList(phoneList);
 		}
 		
@@ -246,6 +244,7 @@ public class PersonService {
 		
 		Term term1 = new Term("partyaddressid", "" + addressId);
 		Term term2 = new Term("partyaddresspersonid", "" + personId);
+		
 		Document partyAddressDoc = findHardly(term1, term2);
 		
 		return partyAddressDoc;
@@ -272,6 +271,7 @@ public class PersonService {
 		
 		Term term1 = new Term("partyphoneid", "" + phoneId);
 		Term term2 = new Term("partyphonepersonid", "" + personId);
+		
 		Document partyPhoneDoc = findHardly(term1, term2);
 		
 		return partyPhoneDoc;
