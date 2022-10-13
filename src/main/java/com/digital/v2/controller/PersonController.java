@@ -115,8 +115,8 @@ public class PersonController {
 		return new ResponseEntity<SuccessMsg>(success, header, HttpStatus.valueOf(200));
 	}
 	
-	@RequestMapping(value = "/inquiry/{personName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "회원 본인 검색", notes = "회원명으로 본인 정보를 검색하기 위한 API.")
+	@RequestMapping(value = "/inquiry/byName/{personName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "회원 검색", notes = "회원명으로 본인 정보를 검색하기 위한 API.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
