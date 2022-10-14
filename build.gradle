@@ -32,6 +32,10 @@ dependencies {
 	implementation 'org.apache.lucene:lucene-core:8.9.0'
 	implementation 'org.apache.lucene:lucene-analyzers-common:8.9.0'
 	implementation 'org.apache.lucene:lucene-queryparser:8.9.0'
+	
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
+	implementation fileTree(dir: '/src/main/lib', include: ['ojdbc8-19.3.0.0.jar'])
+	
 }
 
 tasks.named('test') {
