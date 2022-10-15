@@ -1,2 +1,2 @@
-- DB : Lucene / Web Application Framework: Spring / API Framework : Swagger / 개발언어 : Java
+- DB : Oracle / SQL Mapper Framework: Mybatis / Web Application Framework: Spring / API Framework : Swagger / 개발언어 : Java
 - 서버 : Apache Tomcat
