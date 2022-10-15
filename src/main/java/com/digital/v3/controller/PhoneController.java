@@ -45,7 +45,7 @@ public class PhoneController {
 		Phone resPhone = new Phone();
 		try {
 			if (phoneSvc.phoneWrite(phone)) {
-				resPhone = phoneSvc.phoneSearch("phonenumber", phone.getPhoneNumber());
+				resPhone = phoneSvc.phoneSearch(phone.getPhoneNumber());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -65,7 +65,7 @@ public class PhoneController {
 		ErrorMsg errors = new ErrorMsg();
 		
 		try {
-			Phone phone = phoneSvc.phoneSearch("phonenumber", phoneNumber);
+			Phone phone = phoneSvc.phoneSearch(phoneNumber);
 			return new ResponseEntity<Phone>(phone, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);

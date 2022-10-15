@@ -5,22 +5,22 @@ import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel
 public class Inventory {
-//	inventoryId (long)
+//	inventoryId (long) -> productId (long)
 //	quantity (long)
 	
-	@ApiModelProperty(required = false, position = 1, notes = "상품 재고 ID", example = "0", dataType = "long")
-	private long inventoryId;
+	@ApiModelProperty(required = false, position = 1, notes = "상품 ID", example = "0", dataType = "long")
+	private long productId;
 	
 	@ApiModelProperty(required = true, position = 2, notes = "재고 수량", example = "0", dataType = "long")
 	private long quantity;
 	
-	public long getInventoryId() {
-		long inventoryId = this.inventoryId;
-		return inventoryId;
+	public long getProductId() {
+		long productId = this.productId;
+		return productId;
 	}
 
-	public void setInventoryId(long inventoryId) {
-		this.inventoryId = inventoryId;
+	public void setProductId(long productId) {
+		this.productId = productId;
 	}
 
 	public long getQuantity() {

@@ -35,14 +35,14 @@ public class ProductService {
 			
 			// 중복이 아니면 write
 			product.setProductId(System.currentTimeMillis());
-			product.setInventoryId(System.currentTimeMillis() + 1);
+			product.setProductId(System.currentTimeMillis() + 1);
 			Document doc = new Document();
 			
 			doc.add(new TextField("productid", "" + product.getProductId(), Store.YES));
 			doc.add(new TextField("price", "" + product.getPrice(), Store.YES));
 			doc.add(new TextField("productname", "" + product.getProductName(), Store.YES));
 			doc.add(new TextField("productcategoryid", "" + product.getCategoryId(), Store.YES));
-			doc.add(new TextField("productinventoryid", "" + product.getInventoryId(), Store.YES));
+			doc.add(new TextField("productinventoryid", "" + product.getProductId(), Store.YES));
 			
 			write(doc);
 			return true;
@@ -62,7 +62,7 @@ public class ProductService {
 			product.setPrice(Long.parseLong(productDoc.get("price")));
 			product.setProductName(productDoc.get("productname"));
 			product.setCategoryId(Long.parseLong(productDoc.get("productcategoryid")));
-			product.setInventoryId(Long.parseLong(productDoc.get("productinventoryid")));
+			product.setProductId(Long.parseLong(productDoc.get("productinventoryid")));
 		}
 		
 		return product;
@@ -82,7 +82,7 @@ public class ProductService {
 			product.setPrice(Long.parseLong(productDoc.get("price")));
 			product.setProductName(productDoc.get("productname"));
 			product.setCategoryId(Long.parseLong(productDoc.get("productcategoryid")));
-			product.setInventoryId(Long.parseLong(productDoc.get("productinventoryid")));
+			product.setProductId(Long.parseLong(productDoc.get("productinventoryid")));
 			
 			products.add(product);
 		}
@@ -114,7 +114,7 @@ public class ProductService {
 				product.setPrice(Long.parseLong(productDoc.get("price")));
 				product.setProductName(productDoc.get("productname"));
 				product.setCategoryId(Long.parseLong(productDoc.get("productcategoryid")));
-				product.setInventoryId(Long.parseLong(productDoc.get("productinventoryid")));
+				product.setProductId(Long.parseLong(productDoc.get("productinventoryid")));
 				
 				products.add(product);
 			}

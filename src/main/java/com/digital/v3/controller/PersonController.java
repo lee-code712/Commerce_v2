@@ -52,7 +52,7 @@ public class PersonController {
 		Person resPerson = new Person();
 		try {
 			if (personSvc.signUp(person)) {
-				resPerson = personSvc.personSearch("personname", person.getPersonName());
+				resPerson = personSvc.personSearch(person.getPersonName());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -127,7 +127,7 @@ public class PersonController {
 		ErrorMsg errors = new ErrorMsg();
 		
 		try {
-			Person person = personSvc.personSearch("personname", personName);	
+			Person person = personSvc.personSearch(personName);	
 			
 			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
@@ -158,7 +158,7 @@ public class PersonController {
 			long personId = authSvc.getPersonId(token);
 			
 			if (personSvc.partyAddressWrite(personId, address.getAddressId())) {
-				person = personSvc.personSearch("personid", "" + personId);
+				person = personSvc.personSearchById(personId);
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -184,7 +184,7 @@ public class PersonController {
 			long personId = authSvc.getPersonId(token);
 			
 			if (personSvc.partyAddressDelete(personId, address.getAddressId())) {
-				person = personSvc.personSearch("personid", "" + personId);
+				person = personSvc.personSearchById(personId);
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -210,7 +210,7 @@ public class PersonController {
 			long personId = authSvc.getPersonId(token);
 			
 			if (personSvc.partyPhoneWrite(personId, phone.getPhoneId())) {
-				person = personSvc.personSearch("personid", "" + personId);
+				person = personSvc.personSearchById(personId);
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -236,7 +236,7 @@ public class PersonController {
 			long personId = authSvc.getPersonId(token);
 			
 			if (personSvc.partyPhoneDelete(personId, phone.getPhoneId())) {
-				person = personSvc.personSearch("personid", "" + personId);
+				person = personSvc.personSearchById(personId);
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);

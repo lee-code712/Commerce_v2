@@ -45,7 +45,7 @@ public class AddressController {
 		Address resAddress = new Address();
 		try {
 			if (addressSvc.addressWrite(address)) {
-				resAddress = addressSvc.addressSearch("addressdetail", address.getAddressDetail());
+				resAddress = addressSvc.addressSearch(address.getAddressDetail());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -65,7 +65,7 @@ public class AddressController {
 		ErrorMsg errors = new ErrorMsg();
 		
 		try {
-			Address address = addressSvc.addressSearch("addressdetail", addressDetail);
+			Address address = addressSvc.addressSearch(addressDetail);
 			return new ResponseEntity<Address>(address, header, HttpStatus.valueOf(200));		
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);

@@ -12,14 +12,12 @@ public class Product {
 	@ApiModelProperty(required = true, position = 2, notes = "상품 카테고리 ID", example = "0", dataType = "long")
 	private long categoryId;
 	
-	@ApiModelProperty(required = false, position = 3, notes = "상품 재고 ID", example = "0", dataType = "long")
-	private long inventoryId;
+	@ApiModelProperty(required = true, position = 3, notes = "상품명", example = "상품명", dataType = "string")
+	private String productName;
 	
 	@ApiModelProperty(required = true, position = 4, notes = "상품 가격", example = "1000", dataType = "long")
 	private long price;
 	
-	@ApiModelProperty(required = true, position = 5, notes = "상품명", example = "상품명", dataType = "string")
-	private String productName;
 	
 	public long getProductId() {
 		long productId = this.productId;
@@ -39,13 +37,13 @@ public class Product {
 		this.categoryId = categoryId;
 	}
 	
-	public long getInventoryId() {
-		long inventoryId = this.inventoryId;
-		return inventoryId;
+	public String getProductName() {
+		String productName = this.productName;
+		return productName;
 	}
-
-	public void setInventoryId(long inventoryId) {
-		this.inventoryId = inventoryId;
+	
+	public void setProductName(String productName) {
+		this.productName = productName;
 	}
 
 	public long getPrice() {
@@ -55,15 +53,6 @@ public class Product {
 	
 	public void setPrice(long price) {
 		this.price = price;
-	}
-	
-	public String getProductName() {
-		String productName = this.productName;
-		return productName;
-	}
-	
-	public void setProductName(String productName) {
-		this.productName = productName;
 	}
 	
 }

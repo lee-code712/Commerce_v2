@@ -45,7 +45,7 @@ public class InventoryController {
 		Inventory resInventory = new Inventory();
 		try {
 			if (inventorySvc.inventoryWrite(inventory)) {
-				resInventory = inventorySvc.inventorySearch("inventoryid", "" + inventory.getInventoryId());
+				resInventory = inventorySvc.inventorySearch("inventoryid", "" + inventory.getProductId());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);

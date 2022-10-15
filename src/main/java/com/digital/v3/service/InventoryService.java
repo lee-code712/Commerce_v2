@@ -26,7 +26,7 @@ public class InventoryService {
 		
 		try {
 			// inventory 중복 여부 확인
-			if (inventorySearch("inventoryid", "" + inventory.getInventoryId()).getInventoryId() != 0) {
+			if (inventorySearch("inventoryid", "" + inventory.getProductId()).getProductId() != 0) {
 				// 중복이면 update
 				inventoryUpdate(inventory);
 				return true;
@@ -35,7 +35,7 @@ public class InventoryService {
 			// 중복이 아니면 write
 			Document doc = new Document();
 			
-			doc.add(new TextField("inventoryid", "" + inventory.getInventoryId(), Store.YES));
+			doc.add(new TextField("inventoryid", "" + inventory.getProductId(), Store.YES));
 			doc.add(new TextField("quantity", "" + inventory.getQuantity(), Store.YES));
 			
 			write(doc);
@@ -49,10 +49,10 @@ public class InventoryService {
 	public boolean inventoryUpdate (Inventory inventory) throws Exception {
 		
 		try {
-			Term updateTerm = new Term("inventoryid", "" + inventory.getInventoryId());
+			Term updateTerm = new Term("inventoryid", "" + inventory.getProductId());
 			Document newDoc = new Document();
 			
-			newDoc.add(new TextField("inventoryid", "" + inventory.getInventoryId(), Store.YES));
+			newDoc.add(new TextField("inventoryid", "" + inventory.getProductId(), Store.YES));
 			newDoc.add(new TextField("quantity", "" + inventory.getQuantity(), Store.YES));
 			
 			update(newDoc, updateTerm);
@@ -69,7 +69,7 @@ public class InventoryService {
 		
 		Inventory inventory = new Inventory();
 		if (inventoryDoc != null) {
-			inventory.setInventoryId(Long.parseLong(inventoryDoc.get("inventoryid")));
+			inventory.setProductId(Long.parseLong(inventoryDoc.get("inventoryid")));
 			inventory.setQuantity(Long.parseLong(inventoryDoc.get("quantity")));
 		}
 		
@@ -86,12 +86,12 @@ public class InventoryService {
 		
 		Inventory inventory = new Inventory();
 		if (product.getProductName() != null) {
-			value = "" + product.getInventoryId();
+			value = "" + product.getProductId();
 			
 			Document inventoryDoc = findHardly(key, value);
 			
 			if (inventoryDoc != null) {
-				inventory.setInventoryId(Long.parseLong(inventoryDoc.get("inventoryid")));
+				inventory.setProductId(Long.parseLong(inventoryDoc.get("inventoryid")));
 				inventory.setQuantity(Long.parseLong(inventoryDoc.get("quantity")));
 			}
 		}
@@ -105,7 +105,7 @@ public class InventoryService {
 		try {
 			Inventory inventory = inventorySearchByProduct("productid", "" + productId);
 			
-			if (inventory.getInventoryId() == 0) {
+			if (inventory.getProductId() == 0) {
 				throw new Exception("아직 재고를 등록하지 않은 상품입니다.");
 			}
 			if (inventory.getQuantity() - quantity < 0) {
