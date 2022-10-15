@@ -20,10 +20,9 @@ public class ProductService {
 	
 	/* 상품 등록 */
 	public boolean productWrite (Product product) throws Exception {
-		
 		try {
 			// product 중복 여부 확인
-			if (productSearch(product.getProductName()).getProductName() != null) {
+			if (productMapper.getProductByName(product.getProductName()) != null) {
 				throw new Exception("이미 등록된 상품입니다.");
 			}
 			

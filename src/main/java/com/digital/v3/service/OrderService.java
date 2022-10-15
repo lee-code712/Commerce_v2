@@ -34,10 +34,9 @@ public class OrderService {
 	/* 주문서 등록 */
 	@Transactional
 	public boolean orderSheetWrite (OrderSheet orderSheet) throws Exception {
-		
 		try {
 			// 주문서 중복 여부 확인
-			if (orderSheetSearch(orderSheet.getPersonId()).getOrderSheetId() != 0) {
+			if (orderMapper.getOrderSheetByPerson(orderSheet.getPersonId()) != null) {
 				throw new Exception("이미 등록된 가주문서가 존재합니다.");
 			}
 			
@@ -47,18 +46,21 @@ public class OrderService {
 			
 			Map<Long, Long> productMap = new HashMap<Long, Long>();
 			for (CartProduct product : orderSheet.getProducts()) {
-				if (productMap.get(product.getProductId()) == null) {
-					productMap.put(product.getProductId(), product.getQuantity());
+				long productId = product.getProductId();
+				long quantity = product.getQuantity();
+				
+				if (productMap.get(productId) == null) {
+					productMap.put(productId, quantity);
 				} else {
-					productMap.put(product.getProductId(), product.getQuantity() + productMap.get(product.getProductId()));
+					productMap.put(productId, quantity + productMap.get(productId));
 				}
-				if (!inventorySvc.inventoryQuantityCheck(product.getProductId(), productMap.get(product.getProductId()))) {
-					errorMsg += "상품 ID: " + product.getProductId() + "\n";
+				if (!inventorySvc.inventoryQuantityCheck(productId, productMap.get(productId))) {
+					errorMsg += "상품 ID: " + productId + "\n";
 					if (!exceptionFlag) {
 						exceptionFlag = true;
 					}
 				}
-			}
+			}	
 			
 			if (exceptionFlag) {
 				throw new Exception(errorMsg);
@@ -72,8 +74,8 @@ public class OrderService {
 			
 			// order product orderId update
 			for (CartProduct product : orderSheet.getProducts()) {
-				PartyProductVO orderProductVo = setOrderProductVO(
-						orderSheetVO.getPersonId(), orderSheetVO.getOrderId(), product);
+				PartyProductVO orderProductVo = 
+						setOrderProductVO(orderSheetVO.getPersonId(), orderSheetVO.getOrderId(), product);
 				orderMapper.updateOrderIdOfOrderProduct(orderProductVo);
 			}
 			return true;
@@ -86,7 +88,7 @@ public class OrderService {
 	public boolean orderSheetDelete (long personId) throws Exception {
 		try {
 			// order sheet 존재 여부 확인
-			if (orderSheetSearch(personId).getOrderSheetId() == 0) {
+			if (orderMapper.getOrderSheetByPerson(personId) != null) {
 				throw new Exception("현재 등록된 가주문서가 없습니다.");
 			}
 			
@@ -99,23 +101,22 @@ public class OrderService {
 	}
 	
 	/* 결제 */
+	@Transactional
 	public boolean purchase (Purchase purchase) throws Exception {
-
 		try {
 			OrderSheet orderSheet = orderSheetSearchById(purchase.getOrderSheetId());
 			
 			// 주문서 존재 여부 확인
-			if (orderSheet.getOrderSheetId() == 0) {
+			if (orderMapper.getOrderSheetById(purchase.getOrderSheetId()) == null) {
 				throw new Exception("가주문서를 찾을 수 없습니다.");
 			}
 			
 			// 존재하면 구매 정보 write
 			orderMapper.createPurchase(purchase.getOrderSheetId());
 			
-			// order product 관련 처리
+			// order product들의 재고 수량 update
 			List<CartProduct> products = orderSheet.getProducts();
 			for (CartProduct product : products) {
-				// 재고 수량 update
 				Inventory inventory = inventorySvc.inventorySearchById(product.getProductId());
 				inventory.setQuantity(inventory.getQuantity() - Long.valueOf(product.getQuantity()));
 				inventorySvc.inventoryUpdate(inventory);

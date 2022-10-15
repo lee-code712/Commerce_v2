@@ -8,4 +8,14 @@ public class PhoneVO {
 	private long phoneId;
 	private String phoneNumber;
 	
+	public long getPhoneId() {
+		long phoneId = this.phoneId;
+		return phoneId;
+	}
+	
+	public String getPhoneNumber() {
+		String phoneNumber = this.phoneNumber;
+		return phoneNumber;
+	}
+	
 }

@@ -15,10 +15,9 @@ public class AddressService {
 
 	/* 주소 등록 */
 	public boolean addressWrite (Address address) throws Exception {
-
 		try {
 			// address 중복 여부 확인
-			if (addressSearch(address.getAddressDetail()).getAddressDetail() != null) {
+			if (addressMapper.getAddressByDetail(address.getAddressDetail()) != null) {
 				throw new Exception("이미 등록된 주소입니다."); 
 			} 
 	

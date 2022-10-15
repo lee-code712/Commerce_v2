@@ -38,7 +38,7 @@ public class CartController {
 	AuthService authSvc;
 
 	@RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "장바구니 상품 추가", notes = "특정 상품을 장바구니에 추가하기 위한 API. *입력 필드: productId, purchaseNumber")
+	@ApiOperation(value = "장바구니 상품 추가", notes = "특정 상품을 장바구니에 추가하기 위한 API. *입력 필드: productId, quantity")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Cart.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
@@ -64,7 +64,7 @@ public class CartController {
 	}
 	
 	@RequestMapping(value = "/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "장바구니 상품 삭제", notes = "특정 상품을 장바구니에서 삭제하기 위한 API. *입력 필드: productId, purchaseNumber")
+	@ApiOperation(value = "장바구니 상품 삭제", notes = "특정 상품을 장바구니에서 삭제하기 위한 API. *입력 필드: productId, quantity")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Cart.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)

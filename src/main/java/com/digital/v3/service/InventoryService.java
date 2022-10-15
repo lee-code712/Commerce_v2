@@ -15,10 +15,9 @@ public class InventoryService {
 
 	/* 재고 등록 */
 	public boolean inventoryWrite (Inventory inventory) throws Exception {
-		
 		try {
 			// inventory 중복 여부 확인
-			if (inventorySearchById(inventory.getProductId()).getProductId() != 0) {
+			if (inventoryMapper.getInventoryById(inventory.getProductId()) != null) {
 				// 중복이면 update
 				inventoryUpdate(inventory);
 				return true;
@@ -28,18 +27,6 @@ public class InventoryService {
 			InventoryVO inventoryVo = setInventoryVO(inventory);
 
 			inventoryMapper.createInventory(inventoryVo);
-			return true;
-		} catch (Exception e) {
-			throw e;
-		}
-	}
-	
-	/* 재고 변경 */
-	public boolean inventoryUpdate (Inventory inventory) throws Exception {
-		
-		InventoryVO inventoryVo = setInventoryVO(inventory);
-		try {
-			inventoryMapper.updateInventoryQuantity(inventoryVo);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -71,7 +58,19 @@ public class InventoryService {
 		
 		return inventory;
 	}
-
+	
+	/* 재고 변경 */
+	public boolean inventoryUpdate (Inventory inventory) throws Exception {
+		try {
+			InventoryVO inventoryVo = setInventoryVO(inventory);
+			
+			inventoryMapper.updateInventoryQuantity(inventoryVo);
+			return true;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
 	/* 상품에 대한 입력 수량 유효성 확인 */
 	public boolean inventoryQuantityCheck (long productId, long quantity) throws Exception {
 		

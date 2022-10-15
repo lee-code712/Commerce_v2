@@ -15,10 +15,9 @@ public class PhoneService {
 	
 	/* 전화번호 등록 */
 	public boolean phoneWrite (Phone phone) throws Exception {
-
 		try {
 			// phone 중복 여부 확인
-			if (phoneSearch(phone.getPhoneNumber()).getPhoneNumber() != null) {
+			if (phoneMapper.getPhoneByNumber(phone.getPhoneNumber()) != null) {
 				throw new Exception("이미 등록된 전화번호입니다."); 
 			}
 			

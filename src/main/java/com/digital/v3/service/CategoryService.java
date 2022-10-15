@@ -15,10 +15,9 @@ public class CategoryService {
 	
 	/* 카테고리 등록 */
 	public boolean categoryWrite (Category category) throws Exception {
-		
 		try {
 			// category 중복 여부 확인
-			if (categorySearch(category.getCategoryName()).getCategoryName() != null) {
+			if (categoryMapper.getCategoryByName(category.getCategoryName()) != null) {
 				throw new Exception("이미 등록된 카테고리입니다."); 
 			}
 			
@@ -48,15 +47,19 @@ public class CategoryService {
 	
 	public Category setCategory(CategoryVO categoryVo) {
 		Category category = new Category();
+		
 		category.setCategoryId(categoryVo.getCategoryId());
 		category.setCategoryName(categoryVo.getCategoryName());
+		
 		return category;
 	}
 	
 	public CategoryVO setCategoryVO(Category category) {
 		CategoryVO categoryVo = new CategoryVO();
+		
 		categoryVo.setCategoryId(category.getCategoryId());
 		categoryVo.setCategoryName(category.getCategoryName());
+		
 		return categoryVo;
 	}
 

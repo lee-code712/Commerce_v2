@@ -32,10 +32,9 @@ public class PersonService {
 	/* 회원 등록 */
 	@Transactional
 	public boolean signUp (Person person) throws Exception {
-		
 		try {
 			// person 중복 여부 확인
-			if (personSearch(person.getPersonName()).getPersonName() != null) {
+			if (personMapper.getPersonByName(person.getPersonName()) != null) {
 				throw new Exception("이미 가입한 회원입니다.");
 			}
 
@@ -121,9 +120,9 @@ public class PersonService {
 	
 	/* 회원 주소 등록 */
 	public boolean partyAddressWrite (long personId, long addressId) throws Exception {
-
-		PartyAddressVO partyAddressVo = setPartyAddressVo(personId, addressId);
 		try {
+			PartyAddressVO partyAddressVo = setPartyAddressVo(personId, addressId);
+			
 			// party address 중복 여부 확인
 			if (personMapper.isExistPartyAddress(partyAddressVo) > 0) {
 				throw new Exception("회원 정보에 이미 등록된 주소입니다."); 
@@ -139,9 +138,9 @@ public class PersonService {
 	
 	/* 회원 주소 삭제 */
 	public boolean partyAddressDelete (long personId, long addressId) throws Exception {
-		
-		PartyAddressVO partyAddressVo = setPartyAddressVo(personId, addressId);
 		try {
+			PartyAddressVO partyAddressVo = setPartyAddressVo(personId, addressId);
+			
 			// party address 존재 여부 확인
 			if (personMapper.isExistPartyAddress(partyAddressVo) == 0) {
 				throw new Exception("회원 정보에 해당 주소가 없습니다."); 
@@ -157,9 +156,9 @@ public class PersonService {
 	
 	/* 회원 전화번호 등록 */
 	public boolean partyPhoneWrite (long personId, long phoneId) throws Exception {
-
-		PartyPhoneVO partyPhoneVo = setPartyPhoneVo(personId, phoneId);
 		try {
+			PartyPhoneVO partyPhoneVo = setPartyPhoneVo(personId, phoneId);
+			
 			// party phone 중복 여부 확인
 			if (personMapper.isExistPartyPhone(partyPhoneVo) > 0) {
 				throw new Exception("회원정보에 이미 등록된 전화번호입니다."); 
@@ -175,9 +174,9 @@ public class PersonService {
 	
 	/* 회원 전화번호 삭제 */
 	public boolean partyPhoneDelete (long personId, long phoneId) throws Exception {
-		
-		PartyPhoneVO partyPhoneVo = setPartyPhoneVo(personId, phoneId);
 		try {
+			PartyPhoneVO partyPhoneVo = setPartyPhoneVo(personId, phoneId);
+			
 			// party phone 존재 여부 확인
 			if (personMapper.isExistPartyPhone(partyPhoneVo) == 0) {
 				throw new Exception("회원정보에 해당 전화번호가 없습니다."); 

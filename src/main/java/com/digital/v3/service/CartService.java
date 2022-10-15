@@ -40,25 +40,7 @@ public class CartService {
 			throw e;
 		}
 	}
-	
-	/* 장바구니 상품 삭제 */
-	public boolean cartProductDelete (long personId, CartProduct cartProduct) throws Exception {
-		
-		PartyProductVO partyProductVo = setCartProductVO(personId, cartProduct);
-		try {
-			// cartProduct 존재 여부 확인
-			if (cartMapper.isExistCartProduct(partyProductVo) == 0) {
-				throw new Exception("장바구니에 해당하는 상품이 없습니다."); 
-			}
-			
-			// 존재하면 delete
-			cartMapper.deleteCartProduct(partyProductVo);
-			return true;
-		} catch (Exception e) {
-			throw e;
-		}
-	}
-	
+
 	/* 장바구니 검색 - personId */
 	public Cart cartSearch (long personId) throws Exception {
 
@@ -73,6 +55,24 @@ public class CartService {
 		cart.setCart(cartProductList);
 		
 		return cart;
+	}
+	
+	/* 장바구니 상품 삭제 */
+	public boolean cartProductDelete (long personId, CartProduct cartProduct) throws Exception {
+		try {
+			PartyProductVO partyProductVo = setCartProductVO(personId, cartProduct);
+			
+			// cartProduct 존재 여부 확인
+			if (cartMapper.isExistCartProduct(partyProductVo) == 0) {
+				throw new Exception("장바구니에 해당하는 상품이 없습니다."); 
+			}
+			
+			// 존재하면 delete
+			cartMapper.deleteCartProduct(partyProductVo);
+			return true;
+		} catch (Exception e) {
+			throw e;
+		}
 	}
 	
 	public CartProduct setCartProduct (PartyProductVO cartProductVo) {
