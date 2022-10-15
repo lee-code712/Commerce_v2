@@ -60,9 +60,8 @@ public class OrderController {
 			long personId = authSvc.getPersonId(token);
 			
 			orderSheet.setPersonId(personId);
-			long orderId = orderSvc.orderSheetWrite(orderSheet);
-			if (orderId != 0) {
-				resOrderSheet = orderSvc.orderSheetSearch("ordersheetid", "" + orderId);
+			if (orderSvc.orderSheetWrite(orderSheet)) {
+				resOrderSheet = orderSvc.orderSheetSearch(personId);
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -85,7 +84,7 @@ public class OrderController {
 			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
 			
-			OrderSheet orderSheet = orderSvc.orderSheetSearch("ordersheetpersonid", "" + personId);
+			OrderSheet orderSheet = orderSvc.orderSheetSearch(personId);
 			if (orderSheet.getPersonId() == 0) {
 				return ExceptionUtils.setException(errors, 500, "현재 등록된 가주문서가 없습니다.", header);
 			}
@@ -133,12 +132,9 @@ public class OrderController {
 		
 		Order order = new Order();
 		try {
-			String token = request.getHeader("Authorization");
-			long personId = authSvc.getPersonId(token);
-			
 			purchase.setPurchaseDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
-			if (orderSvc.purchase(personId, purchase)) {
-				order = orderSvc.orderSearch("purchaseid", "" + purchase.getOrderSheetId());
+			if (orderSvc.purchase(purchase)) {
+				order = orderSvc.orderSearchById(purchase.getOrderSheetId());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -162,7 +158,7 @@ public class OrderController {
 			String token = request.getHeader("Authorization");
 			long personId = authSvc.getPersonId(token);
 			
-			OrderList orders = orderSvc.orderListSearch(personId, "purchasedate", keyword);
+			OrderList orders = orderSvc.orderSearchByDate(personId, keyword);
 			return new ResponseEntity<OrderList>(orders, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);

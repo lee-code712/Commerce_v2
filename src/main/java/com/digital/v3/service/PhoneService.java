@@ -48,15 +48,19 @@ public class PhoneService {
 	
 	public Phone setPhone(PhoneVO phoneVo) {
 		Phone phone = new Phone();
+		
 		phone.setPhoneId(phoneVo.getPhoneId());
 		phone.setPhoneNumber(phoneVo.getPhoneNumber());
+		
 		return phone;
 	}
 	
 	public PhoneVO setPhoneVO(Phone phone) {
 		PhoneVO phoneVo = new PhoneVO();
+		
 		phoneVo.setPhoneId(phone.getPhoneId());
 		phoneVo.setPhoneNumber(phone.getPhoneNumber());
+		
 		return phoneVo;
 	}
 	

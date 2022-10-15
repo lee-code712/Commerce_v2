@@ -45,7 +45,7 @@ public class CategoryController {
 		Category resCategory = new Category();
 		try {
 			if (categorySvc.categoryWrite(category)) {
-				resCategory = categorySvc.categorySearch("categoryname", category.getCategoryName());
+				resCategory = categorySvc.categorySearch(category.getCategoryName());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -65,7 +65,7 @@ public class CategoryController {
 		ErrorMsg errors = new ErrorMsg();
 		
 		try {
-			Category category = categorySvc.categorySearch("categoryname", categoryName);
+			Category category = categorySvc.categorySearch(categoryName);
 			return new ResponseEntity<Category>(category, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);

@@ -8,7 +8,7 @@
 	</insert>
 	
 	<select id="getCategoryByName" parameterType="string" resultType="CategoryVO">
-		SELECT NVL(COUNT(categoryid), 0)
+		SELECT categoryid, categoryname
 		FROM category
 		WHERE categoryname = #{categoryName}
 	</select>

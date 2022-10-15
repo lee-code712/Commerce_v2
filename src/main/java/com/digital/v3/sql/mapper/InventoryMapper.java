@@ -9,9 +9,9 @@ public interface InventoryMapper {
 
 	public void createInventory(InventoryVO inventoryVO);
 	
-	public int isExistInventory(long productId);
+	public InventoryVO getInventoryById(long productId);
 	
-	public InventoryVO getInventoryByProduct(String productName); 
+	public InventoryVO getInventoryByName(String productName); 
 	
 	public void updateInventoryQuantity(InventoryVO inventoryVO);
 	

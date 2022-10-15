@@ -1,13 +1,5 @@
 package com.digital.v3.service;
 
-import static com.digital.v3.lucene.DataHandler.delete;
-import static com.digital.v3.lucene.DataHandler.findHardly;
-import static com.digital.v3.lucene.DataHandler.findListHardly;
-import static com.digital.v3.lucene.DataHandler.wildCardQuery;
-import static com.digital.v3.lucene.DataHandler.write;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,11 +7,9 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.index.Term;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.digital.v3.schema.CartProduct;
 import com.digital.v3.schema.Inventory;
@@ -27,21 +17,27 @@ import com.digital.v3.schema.Order;
 import com.digital.v3.schema.OrderList;
 import com.digital.v3.schema.OrderSheet;
 import com.digital.v3.schema.Purchase;
+import com.digital.v3.sql.mapper.OrderMapper;
+import com.digital.v3.sql.vo.AddressVO;
+import com.digital.v3.sql.vo.OrderSheetVO;
+import com.digital.v3.sql.vo.PartyProductVO;
+import com.digital.v3.sql.vo.PhoneVO;
 
 @Component
 public class OrderService {
 	
 	@Resource 
 	InventoryService inventorySvc;
-	@Resource
-	CartService cartSvc;
+	@Autowired
+	OrderMapper orderMapper;
 	
 	/* 주문서 등록 */
-	public long orderSheetWrite (OrderSheet orderSheet) throws Exception {
+	@Transactional
+	public boolean orderSheetWrite (OrderSheet orderSheet) throws Exception {
 		
 		try {
 			// 주문서 중복 여부 확인
-			if (orderSheetSearch("ordersheetpersonid", "" + orderSheet.getPersonId()).getOrderSheetId() != 0) {
+			if (orderSheetSearch(orderSheet.getPersonId()).getOrderSheetId() != 0) {
 				throw new Exception("이미 등록된 가주문서가 존재합니다.");
 			}
 			
@@ -68,14 +64,19 @@ public class OrderService {
 				throw new Exception(errorMsg);
 			}
 			
-			// 모든 상품의 구매 수량이 유효하면 write
+			// 모든 상품의 구매 수량이 유효하면 orderSheet write
 			orderSheet.setOrderSheetId(System.currentTimeMillis());
-			List<Document> docList = setOrderSheetPluralDoc(orderSheet);
+			OrderSheetVO orderSheetVO = setOrderSheetVO(orderSheet);
 			
-			for (Document doc : docList) {
-				write(doc);
+			orderMapper.createOrderSheet(orderSheetVO);
+			
+			// order product orderId update
+			for (CartProduct product : orderSheet.getProducts()) {
+				PartyProductVO orderProductVo = setOrderProductVO(
+						orderSheetVO.getPersonId(), orderSheetVO.getOrderId(), product);
+				orderMapper.updateOrderIdOfOrderProduct(orderProductVo);
 			}
-			return orderSheet.getOrderSheetId();
+			return true;
 		} catch (Exception e) {
 			throw e;
 		}
@@ -83,18 +84,14 @@ public class OrderService {
 	
 	/* 주문서 삭제 */
 	public boolean orderSheetDelete (long personId) throws Exception {
-		
-		// order sheet 존재 여부 확인
-		OrderSheet orderSheet = orderSheetSearch("ordersheetpersonid", "" + personId);
-		if (orderSheet.getOrderSheetId() == 0) {
-			throw new Exception("현재 등록된 가주문서가 없습니다.");
-		}
-		
-		// 존재하면 delete
 		try {
-			Term deleteTerm = new Term("ordersheetid", "" + orderSheet.getOrderSheetId());
+			// order sheet 존재 여부 확인
+			if (orderSheetSearch(personId).getOrderSheetId() == 0) {
+				throw new Exception("현재 등록된 가주문서가 없습니다.");
+			}
 			
-			delete(deleteTerm);
+			// 존재하면 delete
+			orderMapper.deleteOrderSheet(personId);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -102,176 +99,154 @@ public class OrderService {
 	}
 	
 	/* 결제 */
-	public boolean purchase (long personId, Purchase purchase) throws Exception {
+	public boolean purchase (Purchase purchase) throws Exception {
 
 		try {
+			OrderSheet orderSheet = orderSheetSearchById(purchase.getOrderSheetId());
+			
 			// 주문서 존재 여부 확인
-			OrderSheet orderSheet = orderSheetSearch("ordersheetid", "" + purchase.getOrderSheetId());
 			if (orderSheet.getOrderSheetId() == 0) {
 				throw new Exception("가주문서를 찾을 수 없습니다.");
 			}
 			
 			// 존재하면 구매 정보 write
-			Document purchaseDoc = new Document();
-			
-			purchaseDoc.add(new TextField("purchaseid", "" + purchase.getOrderSheetId(), Store.YES));
-			purchaseDoc.add(new TextField("purchasepersonid", "" + orderSheet.getPersonId(), Store.YES));
-			purchaseDoc.add(new TextField("purchasephoneid", "" + orderSheet.getPhoneId(), Store.YES));
-			purchaseDoc.add(new TextField("purchaseaddressid", "" + orderSheet.getAddressId(), Store.YES));
-			purchaseDoc.add(new TextField("purchasedate", "" + purchase.getPurchaseDate(), Store.YES));
-			
-			write(purchaseDoc);
+			orderMapper.createPurchase(purchase.getOrderSheetId());
 			
 			// order product 관련 처리
 			List<CartProduct> products = orderSheet.getProducts();
 			for (CartProduct product : products) {
 				// 재고 수량 update
-				Inventory inventory = inventorySvc.inventorySearchByProduct("productid", "" + product.getProductId());
+				Inventory inventory = inventorySvc.inventorySearchById(product.getProductId());
 				inventory.setQuantity(inventory.getQuantity() - Long.valueOf(product.getQuantity()));
 				inventorySvc.inventoryUpdate(inventory);
-				
-				// 장바구니에 있는 상품이면 장바구니에서 삭제
-				if(cartSvc.cartProductSearch(personId, product).getProductId() != 0) {
-					cartSvc.cartProductDelete(personId, product);
-				}
 			}
-			
-			// 주문서 delete
-			orderSheetDelete(orderSheet.getPersonId());
-			
 			return true;
 		} catch (Exception e) {
 			throw e;
 		}
 	}
 	
-	/* 주문서 검색 */
-	public OrderSheet orderSheetSearch (String key, String value) {
+	/* 주문서 검색 - personId */
+	public OrderSheet orderSheetSearch (long personId) {
 		
-		Document orderSheetDoc = findHardly(key, value);
+		OrderSheetVO orderSheetVo = orderMapper.getOrderSheetByPerson(personId);
 		
 		OrderSheet orderSheet = new OrderSheet();
-		if (orderSheetDoc != null) {
-			orderSheet.setOrderSheetId(Long.parseLong(orderSheetDoc.get("ordersheetid")));
-			orderSheet.setPersonId(Long.parseLong(orderSheetDoc.get("ordersheetpersonid")));
-			orderSheet.setPhoneId(Long.parseLong(orderSheetDoc.get("ordersheetphoneid")));
-			orderSheet.setAddressId(Long.parseLong(orderSheetDoc.get("ordersheetaddressid")));
-			
-			// order product list set
-			List<CartProduct> products = orderProductSearch("orderid", "" + orderSheet.getOrderSheetId());
-			orderSheet.setProducts(products);
+		if (orderSheetVo != null) {
+			orderSheet = setOrderSheet(orderSheetVo);
 		}
 
 		return orderSheet;
 	}
 	
-	/* 주문 상품 검색 */
-	public List<CartProduct> orderProductSearch (String key, String value) {
+	/* 주문서 검색 - orderSheetId */
+	public OrderSheet orderSheetSearchById (long orderSheetId) {
 		
-		List<Document> orderProductDocList = findListHardly(key, value);
-
-		List<CartProduct> products = new ArrayList<CartProduct>();
-		for (Document orderProductDoc : orderProductDocList) {
-			CartProduct orderProduct = new CartProduct();
-			orderProduct.setProductId(Long.parseLong(orderProductDoc.get("orderproductid")));
-			orderProduct.setQuantity(Long.parseLong(orderProductDoc.get("orderquantity")));
-			
-			products.add(orderProduct);
+		OrderSheetVO orderSheetVo = orderMapper.getOrderSheetById(orderSheetId);
+		
+		OrderSheet orderSheet = new OrderSheet();
+		if (orderSheetVo != null) {
+			orderSheet = setOrderSheet(orderSheetVo);
 		}
 
-		return products;
+		return orderSheet;
 	}
 	
-	/* 주문 검색 */
-	public Order orderSearch (String key, String value) throws Exception {
+	/* 주문 검색 - orderSheetId */
+	public Order orderSearchById (long orderSheetId) throws Exception {
 
-		Document purchaseDoc = findHardly(key, value);
+		OrderSheetVO orderVo = orderMapper.getOrderById(orderSheetId);
 		
 		Order order = new Order();
-		if (purchaseDoc != null) {
-			// purchaseInfo set
-			OrderSheet orderInfo = new OrderSheet();
-			orderInfo.setOrderSheetId(Long.parseLong(purchaseDoc.get("purchaseid")));
-			orderInfo.setPersonId(Long.parseLong(purchaseDoc.get("purchasepersonid")));
-			orderInfo.setPhoneId(Long.parseLong(purchaseDoc.get("purchasephoneid")));
-			orderInfo.setAddressId(Long.parseLong(purchaseDoc.get("purchaseaddressid")));
-			// order product list set
-			List<CartProduct> products = orderProductSearch("orderid", "" + orderInfo.getOrderSheetId());
-			orderInfo.setProducts(products);
-			order.setPurchaseInfo(orderInfo);
+		if (orderVo != null) {
+			order.setPurchaseDate(orderVo.getPurchaseDate());
 			
-			// purchase date set
-			LocalDateTime purchaseDate = LocalDateTime.parse((String) purchaseDoc.get("purchasedate"), 
-					DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-			order.setPurchaseDate(purchaseDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+			// purchaseInfo set
+			OrderSheet purchaseInfo = setOrderSheet(orderVo);
+			order.setPurchaseInfo(purchaseInfo);
 		}
 
 		return order;
 	}
 	
-	/* 키워드를 이용한 주문 목록 검색 */
-	public OrderList orderListSearch (long personId, String key, String value) throws Exception {
+	/* 주문 검색 - purchaseDate */
+	public OrderList orderSearchByDate (long personId, String purchaseDate) throws Exception {
 
-		List<Document> purchaseDocList = wildCardQuery(key, value);
+		List<OrderSheetVO> orderVoList = orderMapper.getOrderByDate(personId, purchaseDate);
 		
 		OrderList orders = new OrderList();
 		List<Order> orderList = new ArrayList<Order>();
-		for (Document purchaseDoc : purchaseDocList) {
+		for (OrderSheetVO orderVo : orderVoList) {
+			Order order = new Order();
+			order.setPurchaseDate(orderVo.getPurchaseDate());
 			
-			if (purchaseDoc.get("purchasepersonid").equals("" + personId)) {
-				Order order = new Order();
-				// purchaseInfo set
-				OrderSheet orderInfo = new OrderSheet();
-				orderInfo.setOrderSheetId(Long.parseLong(purchaseDoc.get("purchaseid")));
-				orderInfo.setPersonId(Long.parseLong(purchaseDoc.get("purchasepersonid")));
-				orderInfo.setPhoneId(Long.parseLong(purchaseDoc.get("purchasephoneid")));
-				orderInfo.setAddressId(Long.parseLong(purchaseDoc.get("purchaseaddressid")));
-				// order product list set
-				List<CartProduct> products = orderProductSearch("orderid", "" + orderInfo.getOrderSheetId());
-				orderInfo.setProducts(products);
-				order.setPurchaseInfo(orderInfo);
-				
-				// purchase date set
-				LocalDateTime purchaseDate = LocalDateTime.parse((String) purchaseDoc.get("purchasedate"), 
-						DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-				order.setPurchaseDate(purchaseDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-				
-				orderList.add(order);
-			}
+			// purchaseInfo set
+			OrderSheet purchaseInfo = setOrderSheet(orderVo);
+			order.setPurchaseInfo(purchaseInfo);
+			
+			orderList.add(order);
 		}
-		
 		orders.setOrders(orderList);
 
 		return orders;
 	}
-	
-	public List<Document> setOrderSheetPluralDoc (OrderSheet orderSheet) {
 
-		List<Document> docList = new ArrayList<Document>();
+	public OrderSheet setOrderSheet (OrderSheetVO orderSheetVo) {
+		OrderSheet orderSheet = new OrderSheet();
 		
-		// order sheet doc add
-		Document orderSheetDoc = new Document();
+		orderSheet.setOrderSheetId(orderSheetVo.getOrderId());
+		orderSheet.setPersonId(orderSheetVo.getPersonId());
+		orderSheet.setPhoneId(orderSheetVo.getPhoneVo().getPhoneId());
+		orderSheet.setAddressId(orderSheetVo.getAddressVo().getAddressId());
 		
-		orderSheetDoc.add(new TextField("ordersheetid", "" + orderSheet.getOrderSheetId(), Store.YES));
-		orderSheetDoc.add(new TextField("ordersheetpersonid", "" + orderSheet.getPersonId(), Store.YES));
-		orderSheetDoc.add(new TextField("ordersheetphoneid", "" + orderSheet.getPhoneId(), Store.YES));
-		orderSheetDoc.add(new TextField("ordersheetaddressid", "" + orderSheet.getAddressId(), Store.YES));
-
-		docList.add(orderSheetDoc);
-		
-		// order product doc add
-		List<CartProduct> products = orderSheet.getProducts();
-		for (CartProduct product : products) {
-			Document productDoc = new Document();
-			
-			productDoc.add(new TextField("orderid", "" + orderSheet.getOrderSheetId(), Store.YES));
-			productDoc.add(new TextField("orderproductid", "" + product.getProductId(), Store.YES));
-			productDoc.add(new TextField("orderquantity", "" + product.getQuantity(), Store.YES));
-			
-			docList.add(productDoc);
+		// order product set
+		List<CartProduct> products = new ArrayList<CartProduct>();
+		for (PartyProductVO orderProductVo : orderSheetVo.getPartyProductVoList()) {
+			CartProduct orderProduct = setOrderProduct(orderProductVo);
+			products.add(orderProduct);
 		}
+		orderSheet.setProducts(products);
 		
-		return docList;
+		return orderSheet;
+	}
+	
+	public OrderSheetVO setOrderSheetVO (OrderSheet orderSheet) {
+		OrderSheetVO orderSheetVo = new OrderSheetVO();
+		
+		orderSheetVo.setOrderId(orderSheet.getOrderSheetId());
+		orderSheetVo.setPersonId(orderSheet.getPersonId());
+		
+		// phoneVo set
+		PhoneVO phoneVo = new PhoneVO();
+		phoneVo.setPhoneId(orderSheet.getPhoneId());
+		orderSheetVo.setPhoneVo(phoneVo);
+		
+		// addressVo set
+		AddressVO addressVo = new AddressVO();
+		addressVo.setAddressId(orderSheet.getAddressId());
+		orderSheetVo.setAddressVo(addressVo);
+		
+		return orderSheetVo;
+	}
+	
+	public CartProduct setOrderProduct (PartyProductVO orderProductVo) {
+		CartProduct orderProduct = new CartProduct();
+		
+		orderProduct.setProductId(orderProductVo.getProductId());
+		orderProduct.setQuantity(orderProductVo.getQuantity());
+		
+		return orderProduct;
+	}
+	
+	public PartyProductVO setOrderProductVO (long personId, long orderId, CartProduct orderProduct) {
+		PartyProductVO orderProductVo = new PartyProductVO();
+		
+		orderProductVo.setPersonId(personId);
+		orderProductVo.setOrderId(orderId);
+		orderProductVo.setProductId(orderProduct.getProductId());
+		orderProductVo.setQuantity(orderProduct.getQuantity());
+		
+		return orderProductVo;
 	}
 
 }

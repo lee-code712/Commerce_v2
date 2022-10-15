@@ -34,7 +34,7 @@ public class ProductController {
 	ProductService productSvc;
 	
 	@RequestMapping(value = "/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "상품 등록", notes = "상품 등록을 위한 API. *입력 필드: categoryId, price, productName")
+	@ApiOperation(value = "상품 등록", notes = "상품 등록을 위한 API. *입력 필드: categoryId, productName, price")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Product.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
@@ -46,7 +46,7 @@ public class ProductController {
 		Product resProduct = new Product();
 		try {
 			if (productSvc.productWrite(product)) {
-				resProduct = productSvc.productSearch("productname", product.getProductName());
+				resProduct = productSvc.productSearch(product.getProductName());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -66,7 +66,7 @@ public class ProductController {
 		ErrorMsg errors = new ErrorMsg();
 		
 		try {
-			ProductList products = productSvc.productSearchByKeyword("productname", keyword);
+			ProductList products = productSvc.productSearchByKeyword(keyword);
 			return new ResponseEntity<ProductList>(products, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -84,7 +84,7 @@ public class ProductController {
 		ErrorMsg errors = new ErrorMsg();
 		
 		try {
-			ProductList products = productSvc.productSearchByCategory("categoryname", categoryName);
+			ProductList products = productSvc.productSearchByCategory(categoryName);
 			return new ResponseEntity<ProductList>(products, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);

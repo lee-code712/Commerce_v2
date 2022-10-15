@@ -193,6 +193,7 @@ public class PersonService {
 	
 	public Person setPerson(PersonVO personVo) {
 		Person person = new Person();
+		
 		person.setPersonId(personVo.getPersonId());
 		person.setPersonName(personVo.getPersonName());
 		person.setPassword(personVo.getPassword());
@@ -219,24 +220,30 @@ public class PersonService {
 	
 	public PersonVO setPersonVO(Person person) {
 		PersonVO personVo = new PersonVO();
+		
 		personVo.setPersonId(person.getPersonId());
 		personVo.setPersonName(person.getPersonName());
 		personVo.setPassword(person.getPassword());
 		personVo.setGender(person.getGender());
+		
 		return personVo;
 	}
 	
 	public PartyAddressVO setPartyAddressVo(long personId, long addressId) throws Exception {
 		PartyAddressVO partyAddressVo = new PartyAddressVO();
+		
 		partyAddressVo.setPersonId(personId);
 		partyAddressVo.setAddressId(addressId);
+		
 		return partyAddressVo;
 	}
 	
 	public PartyPhoneVO setPartyPhoneVo(long personId, long phoneId) throws Exception {
 		PartyPhoneVO partyPhoneVo = new PartyPhoneVO();
+		
 		partyPhoneVo.setPersonId(personId);
 		partyPhoneVo.setPhoneId(phoneId);
+		
 		return partyPhoneVo;
 	}
 }

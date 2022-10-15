@@ -1,44 +1,33 @@
 package com.digital.v3.service;
 
-import static com.digital.v3.lucene.DataHandler.findHardly;
-import static com.digital.v3.lucene.DataHandler.update;
-import static com.digital.v3.lucene.DataHandler.write;
-
-import javax.annotation.Resource;
-
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.document.Field.Store;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.digital.v3.schema.Inventory;
-import com.digital.v3.schema.Product;
+import com.digital.v3.sql.mapper.InventoryMapper;
+import com.digital.v3.sql.vo.InventoryVO;
 
 @Component
 public class InventoryService {
-	
-	@Resource
-	ProductService productSvc;
+
+	@Autowired
+	InventoryMapper inventoryMapper;
 
 	/* 재고 등록 */
 	public boolean inventoryWrite (Inventory inventory) throws Exception {
 		
 		try {
 			// inventory 중복 여부 확인
-			if (inventorySearch("inventoryid", "" + inventory.getProductId()).getProductId() != 0) {
+			if (inventorySearchById(inventory.getProductId()).getProductId() != 0) {
 				// 중복이면 update
 				inventoryUpdate(inventory);
 				return true;
 			}
 			
 			// 중복이 아니면 write
-			Document doc = new Document();
-			
-			doc.add(new TextField("inventoryid", "" + inventory.getProductId(), Store.YES));
-			doc.add(new TextField("quantity", "" + inventory.getQuantity(), Store.YES));
-			
-			write(doc);
+			InventoryVO inventoryVo = setInventoryVO(inventory);
+
+			inventoryMapper.createInventory(inventoryVo);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -48,63 +37,46 @@ public class InventoryService {
 	/* 재고 변경 */
 	public boolean inventoryUpdate (Inventory inventory) throws Exception {
 		
+		InventoryVO inventoryVo = setInventoryVO(inventory);
 		try {
-			Term updateTerm = new Term("inventoryid", "" + inventory.getProductId());
-			Document newDoc = new Document();
-			
-			newDoc.add(new TextField("inventoryid", "" + inventory.getProductId(), Store.YES));
-			newDoc.add(new TextField("quantity", "" + inventory.getQuantity(), Store.YES));
-			
-			update(newDoc, updateTerm);
+			inventoryMapper.updateInventoryQuantity(inventoryVo);
 			return true;
 		} catch (Exception e) {
 			throw e;
 		}
 	}
 	
-	/* 재고 검색 */
-	public Inventory inventorySearch (String key, String value) throws Exception {
+	/* 재고 검색 - productName */
+	public Inventory inventorySearch (String productName) throws Exception {
 		
-		Document inventoryDoc = findHardly(key, value);
+		InventoryVO inventoryVo = inventoryMapper.getInventoryByName(productName);
 		
 		Inventory inventory = new Inventory();
-		if (inventoryDoc != null) {
-			inventory.setProductId(Long.parseLong(inventoryDoc.get("inventoryid")));
-			inventory.setQuantity(Long.parseLong(inventoryDoc.get("quantity")));
+		if (inventoryVo != null) {
+			inventory = setInventory(inventoryVo);
 		}
 		
 		return inventory;
 	}
 	
-	/* 상품 정보를 이용한 재고 검색 */
-	public Inventory inventorySearchByProduct (String productKey, String productValue) throws Exception {
+	/* 재고 검색 - productId */
+	public Inventory inventorySearchById (long productId) throws Exception {
 		
-		String key = "inventoryid";
-		String value;
-		
-		Product product = productSvc.productSearch(productKey, productValue);
+		InventoryVO inventoryVo = inventoryMapper.getInventoryById(productId);
 		
 		Inventory inventory = new Inventory();
-		if (product.getProductName() != null) {
-			value = "" + product.getProductId();
-			
-			Document inventoryDoc = findHardly(key, value);
-			
-			if (inventoryDoc != null) {
-				inventory.setProductId(Long.parseLong(inventoryDoc.get("inventoryid")));
-				inventory.setQuantity(Long.parseLong(inventoryDoc.get("quantity")));
-			}
+		if (inventoryVo != null) {
+			inventory = setInventory(inventoryVo);
 		}
 		
 		return inventory;
 	}
 
-	/* 상품에 대한 입력 수량 유효성 검사 */
+	/* 상품에 대한 입력 수량 유효성 확인 */
 	public boolean inventoryQuantityCheck (long productId, long quantity) throws Exception {
 		
 		try {
-			Inventory inventory = inventorySearchByProduct("productid", "" + productId);
-			
+			Inventory inventory = inventorySearchById(productId);
 			if (inventory.getProductId() == 0) {
 				throw new Exception("아직 재고를 등록하지 않은 상품입니다.");
 			}
@@ -116,4 +88,23 @@ public class InventoryService {
 			throw e;
 		}
 	}
+	
+	public Inventory setInventory(InventoryVO inventoryVo) {
+		Inventory inventory = new Inventory();
+		
+		inventory.setProductId(inventoryVo.getProductId());
+		inventory.setQuantity(inventoryVo.getQuantity());
+		
+		return inventory;
+	}
+	
+	public InventoryVO setInventoryVO(Inventory inventory) {
+		InventoryVO inventoryVo = new InventoryVO();
+		
+		inventoryVo.setProductId(inventory.getProductId());
+		inventoryVo.setQuantity(inventory.getQuantity());
+		
+		return inventoryVo;
+	}
+	
 }

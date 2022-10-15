@@ -45,7 +45,7 @@ public class InventoryController {
 		Inventory resInventory = new Inventory();
 		try {
 			if (inventorySvc.inventoryWrite(inventory)) {
-				resInventory = inventorySvc.inventorySearch("inventoryid", "" + inventory.getProductId());
+				resInventory = inventorySvc.inventorySearchById(inventory.getProductId());
 			}
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
@@ -65,7 +65,7 @@ public class InventoryController {
 		ErrorMsg errors = new ErrorMsg();
 		
 		try {
-			Inventory inventory = inventorySvc.inventorySearchByProduct("productname", productName);
+			Inventory inventory = inventorySvc.inventorySearch(productName);
 			return new ResponseEntity<Inventory>(inventory, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);

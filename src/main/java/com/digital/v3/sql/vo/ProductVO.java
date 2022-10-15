@@ -9,5 +9,6 @@ public class ProductVO {
 	private String productName;
 	private long price;
 	private CategoryVO categoryVo;
+	private long quantity;
 	
 }

@@ -1,53 +1,63 @@
 package com.digital.v3.service;
 
-import static com.digital.v3.lucene.DataHandler.findHardly;
-import static com.digital.v3.lucene.DataHandler.write;
-
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.document.Field.Store;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.digital.v3.schema.Category;
+import com.digital.v3.sql.mapper.CategoryMapper;
+import com.digital.v3.sql.vo.CategoryVO;
 
 @Component
 public class CategoryService {
+	
+	@Autowired
+	CategoryMapper categoryMapper;
 	
 	/* 카테고리 등록 */
 	public boolean categoryWrite (Category category) throws Exception {
 		
 		try {
 			// category 중복 여부 확인
-			if (categorySearch("categoryname", category.getCategoryName()).getCategoryName() != null) {
+			if (categorySearch(category.getCategoryName()).getCategoryName() != null) {
 				throw new Exception("이미 등록된 카테고리입니다."); 
 			}
 			
 			// 중복이 아니면 write
 			category.setCategoryId(System.currentTimeMillis());
-			Document categoryDoc = new Document();
-			
-			categoryDoc.add(new TextField("categoryid", "" + category.getCategoryId(), Store.YES));
-			categoryDoc.add(new TextField("categoryname", "" + category.getCategoryName(), Store.YES));
-			
-			write(categoryDoc);
+			CategoryVO categoryVo = setCategoryVO(category);
+
+			categoryMapper.createCategory(categoryVo);
 			return true;
 		} catch (Exception e) {
 			throw e;
 		}
 	}
 	
-	/* 카테고리 검색 */
-	public Category categorySearch (String key, String value) throws Exception {
+	/* 카테고리 검색 - categoryName */
+	public Category categorySearch (String categoryName) throws Exception {
 		
-		Document categoryDoc = findHardly(key, value);
+		CategoryVO categoryVo = categoryMapper.getCategoryByName(categoryName);
 		
 		Category category = new Category();
-		if (categoryDoc != null) {
-			category.setCategoryId(Long.parseLong(categoryDoc.get("categoryid")));
-			category.setCategoryName(categoryDoc.get("categoryname"));
+		if (categoryVo != null) {
+			category = setCategory(categoryVo);
 		}
 		
 		return category;
+	}
+	
+	public Category setCategory(CategoryVO categoryVo) {
+		Category category = new Category();
+		category.setCategoryId(categoryVo.getCategoryId());
+		category.setCategoryName(categoryVo.getCategoryName());
+		return category;
+	}
+	
+	public CategoryVO setCategoryVO(Category category) {
+		CategoryVO categoryVo = new CategoryVO();
+		categoryVo.setCategoryId(category.getCategoryId());
+		categoryVo.setCategoryName(category.getCategoryName());
+		return categoryVo;
 	}
 
 }

@@ -48,15 +48,19 @@ public class AddressService {
 	
 	public Address setAddress(AddressVO addressVo) {
 		Address address = new Address();
+		
 		address.setAddressId(addressVo.getAddressId());
 		address.setAddressDetail(addressVo.getAddressDetail());
+		
 		return address;
 	}
 	
 	public AddressVO setAddressVO(Address address) {
 		AddressVO addressVo = new AddressVO();
+		
 		addressVo.setAddressId(address.getAddressId());
 		addressVo.setAddressDetail(address.getAddressDetail());
+		
 		return addressVo;
 	}
 }

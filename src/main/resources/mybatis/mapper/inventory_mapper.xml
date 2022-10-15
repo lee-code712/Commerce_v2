@@ -7,13 +7,14 @@
 	    VALUES (#{productId}, #{quantity}, SYSDATE, SYSDATE)
 	</insert>
 	
-	<select id="isExistInventory" parameterType="long" resultType="int">
-		SELECT NVL(COUNT(productid), 0)
-		FROM inventory
-		WHERE productid = #{productId}
+	<select id="getInventoryById" parameterType="long" resultType="InventoryVO">
+		SELECT i.productid, i.quantity
+		FROM inventory i
+			JOIN product p ON p.productid = i.productid
+		WHERE p.productid = #{productId}
 	</select>
 	
-	<select id="getInventoryByProduct" parameterType="long" resultType="InventoryVO">
+	<select id="getInventoryByName" parameterType="string" resultType="InventoryVO">
 		SELECT i.productid, i.quantity
 		FROM inventory i
 			JOIN product p ON p.productid = i.productid

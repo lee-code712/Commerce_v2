@@ -3,12 +3,12 @@
 <mapper namespace="com.digital.v3.sql.mapper.PhoneMapper">
 
 	<insert id="createPhone" parameterType="PhoneVO">
-	    INSERT INTO address (phoneid, phonenumber, createdate, updatedate)
+	    INSERT INTO phone (phoneid, phonenumber, createdate, updatedate)
 	    VALUES (#{phoneId}, #{phoneNumber}, SYSDATE, SYSDATE)
 	</insert>
 	
 	<select id="getPhoneByNumber" parameterType="string" resultType="PhoneVO">
-		SELECT NVL(COUNT(phoneid), 0)
+		SELECT phoneid, phonenumber
 		FROM phone
 		WHERE phonenumber = #{phoneNumber}
 	</select>

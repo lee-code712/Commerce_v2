@@ -8,7 +8,7 @@
 	</insert>
 	
 	<select id="getAddressByDetail" parameterType="string" resultType="AddressVO">
-		SELECT NVL(COUNT(addressid), 0)
+		SELECT addressid, addressdetail
 		FROM address
 		WHERE addressdetail = #{addressDetail}
 	</select>
