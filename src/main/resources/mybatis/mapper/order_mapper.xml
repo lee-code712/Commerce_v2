@@ -122,7 +122,12 @@
 			JOIN partyproduct pp ON pp.orderid = o.orderid
 			JOIN purchase pu ON pu.orderid = o.orderid
 		WHERE o.personid = #{personId} 
+		<if test="date.length == 8">
 			AND INSTR(pu.createdate, TO_DATE(#{date}, 'YYYYMMDD')) <![CDATA[>]]> 0
+		</if>
+		<if test="date.length == 6">
+			AND pu.createdate between TO_DATE(#{date}, 'YYYYMM') AND LAST_DAY(TO_DATE(#{date}, 'YYYYMM'))
+		</if>
 	</select>
 	
 </mapper>
