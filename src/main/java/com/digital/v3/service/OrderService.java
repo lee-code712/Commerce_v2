@@ -88,7 +88,7 @@ public class OrderService {
 	public boolean orderSheetDelete (long personId) throws Exception {
 		try {
 			// order sheet 존재 여부 확인
-			if (orderMapper.getOrderSheetByPerson(personId) != null) {
+			if (orderMapper.getOrderSheetByPerson(personId) == null) {
 				throw new Exception("현재 등록된 가주문서가 없습니다.");
 			}
 			
