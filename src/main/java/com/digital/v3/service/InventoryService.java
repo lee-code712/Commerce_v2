@@ -88,7 +88,7 @@ public class InventoryService {
 		}
 	}
 	
-	public Inventory setInventory(InventoryVO inventoryVo) {
+	public Inventory setInventory (InventoryVO inventoryVo) {
 		Inventory inventory = new Inventory();
 		
 		inventory.setProductId(inventoryVo.getProductId());
@@ -97,7 +97,7 @@ public class InventoryService {
 		return inventory;
 	}
 	
-	public InventoryVO setInventoryVO(Inventory inventory) {
+	public InventoryVO setInventoryVO (Inventory inventory) {
 		InventoryVO inventoryVo = new InventoryVO();
 		
 		inventoryVo.setProductId(inventory.getProductId());

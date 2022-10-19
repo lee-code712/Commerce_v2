@@ -82,7 +82,7 @@ public class ProductService {
 		return productList;
 	}
 	
-	public Product setProduct(ProductVO productVo) {
+	public Product setProduct (ProductVO productVo) {
 		Product product = new Product();		
 		
 		product.setProductId(productVo.getProductId());
@@ -93,7 +93,7 @@ public class ProductService {
 		return product;
 	}
 	
-	public ProductVO setProductVO(Product product) {
+	public ProductVO setProductVO (Product product) {
 		ProductVO productVo = new ProductVO();		
 		
 		productVo.setProductId(product.getProductId());

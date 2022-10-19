@@ -45,7 +45,7 @@ public class CategoryService {
 		return category;
 	}
 	
-	public Category setCategory(CategoryVO categoryVo) {
+	public Category setCategory (CategoryVO categoryVo) {
 		Category category = new Category();
 		
 		category.setCategoryId(categoryVo.getCategoryId());
@@ -54,7 +54,7 @@ public class CategoryService {
 		return category;
 	}
 	
-	public CategoryVO setCategoryVO(Category category) {
+	public CategoryVO setCategoryVO (Category category) {
 		CategoryVO categoryVo = new CategoryVO();
 		
 		categoryVo.setCategoryId(category.getCategoryId());

@@ -45,7 +45,7 @@ public class PhoneService {
 		return phone;
 	}
 	
-	public Phone setPhone(PhoneVO phoneVo) {
+	public Phone setPhone (PhoneVO phoneVo) {
 		Phone phone = new Phone();
 		
 		phone.setPhoneId(phoneVo.getPhoneId());
@@ -54,7 +54,7 @@ public class PhoneService {
 		return phone;
 	}
 	
-	public PhoneVO setPhoneVO(Phone phone) {
+	public PhoneVO setPhoneVO (Phone phone) {
 		PhoneVO phoneVo = new PhoneVO();
 		
 		phoneVo.setPhoneId(phone.getPhoneId());

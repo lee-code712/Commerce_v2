@@ -45,7 +45,7 @@ public class AddressService {
 		return address;
 	}
 	
-	public Address setAddress(AddressVO addressVo) {
+	public Address setAddress (AddressVO addressVo) {
 		Address address = new Address();
 		
 		address.setAddressId(addressVo.getAddressId());
@@ -54,7 +54,7 @@ public class AddressService {
 		return address;
 	}
 	
-	public AddressVO setAddressVO(Address address) {
+	public AddressVO setAddressVO (Address address) {
 		AddressVO addressVo = new AddressVO();
 		
 		addressVo.setAddressId(address.getAddressId());

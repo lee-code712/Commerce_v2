@@ -49,12 +49,10 @@ public class PersonService {
 			for (Address address : addressList) {
 				try {
 					if (addressSvc.addressWrite(address)) {
-						partyAddressWrite(personVo.getPersonId(), 
-								addressSvc.addressSearch(address.getAddressDetail()).getAddressId());
+						partyAddressWrite(personVo.getPersonId(), addressSvc.addressSearch(address.getAddressDetail()).getAddressId());
 					}
 				} catch (Exception e) {
-					partyAddressWrite(personVo.getPersonId(), 
-							addressSvc.addressSearch(address.getAddressDetail()).getAddressId());
+					partyAddressWrite(personVo.getPersonId(), addressSvc.addressSearch(address.getAddressDetail()).getAddressId());
 				}
 			}
 			
@@ -63,12 +61,10 @@ public class PersonService {
 			for (Phone phone : phoneList) {
 				try {
 					if (phoneSvc.phoneWrite(phone)) {
-						partyPhoneWrite(personVo.getPersonId(), 
-								phoneSvc.phoneSearch(phone.getPhoneNumber()).getPhoneId());
+						partyPhoneWrite(personVo.getPersonId(), phoneSvc.phoneSearch(phone.getPhoneNumber()).getPhoneId());
 					}
 				} catch (Exception e) {
-					partyPhoneWrite(personVo.getPersonId(), 
-							phoneSvc.phoneSearch(phone.getPhoneNumber()).getPhoneId());
+					partyPhoneWrite(personVo.getPersonId(), phoneSvc.phoneSearch(phone.getPhoneNumber()).getPhoneId());
 				}
 			}
 			return true;
@@ -190,7 +186,7 @@ public class PersonService {
 		}
 	}
 	
-	public Person setPerson(PersonVO personVo) {
+	public Person setPerson (PersonVO personVo) {
 		Person person = new Person();
 		
 		person.setPersonId(personVo.getPersonId());
@@ -217,7 +213,7 @@ public class PersonService {
 		return person;
 	}
 	
-	public PersonVO setPersonVO(Person person) {
+	public PersonVO setPersonVO (Person person) {
 		PersonVO personVo = new PersonVO();
 		
 		personVo.setPersonId(person.getPersonId());
@@ -228,7 +224,7 @@ public class PersonService {
 		return personVo;
 	}
 	
-	public PartyAddressVO setPartyAddressVo(long personId, long addressId) throws Exception {
+	public PartyAddressVO setPartyAddressVo (long personId, long addressId) {
 		PartyAddressVO partyAddressVo = new PartyAddressVO();
 		
 		partyAddressVo.setPersonId(personId);
@@ -237,7 +233,7 @@ public class PersonService {
 		return partyAddressVo;
 	}
 	
-	public PartyPhoneVO setPartyPhoneVo(long personId, long phoneId) throws Exception {
+	public PartyPhoneVO setPartyPhoneVo (long personId, long phoneId) {
 		PartyPhoneVO partyPhoneVo = new PartyPhoneVO();
 		
 		partyPhoneVo.setPersonId(personId);
