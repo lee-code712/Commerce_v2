@@ -24,9 +24,9 @@ import com.digital.v3.service.PersonService;
 import com.digital.v3.utils.ExceptionUtils;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -45,7 +45,7 @@ public class PersonController {
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> signUp (@Parameter(name = "회원가입 정보", required = true) @RequestBody Person person) {
+	public ResponseEntity<?> signUp (@ApiParam(value = "회원가입 정보", required = true) @RequestBody Person person) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 
@@ -57,7 +57,6 @@ public class PersonController {
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
-		
 		return new ResponseEntity<Person>(resPerson, header, HttpStatus.valueOf(200));
 	}
 	
@@ -67,7 +66,7 @@ public class PersonController {
 		@ApiResponse(code = 200, message = "성공", response = SuccessMsg.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> login (@Parameter(name = "로그인 정보", required = true) @RequestBody Person person) {
+	public ResponseEntity<?> login (@ApiParam(value = "로그인 정보", required = true) @RequestBody Person person) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		SuccessMsg success = new SuccessMsg();
@@ -86,7 +85,6 @@ public class PersonController {
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
-		
 		return new ResponseEntity<SuccessMsg>(success, header, HttpStatus.valueOf(200));
 	}
 	
@@ -111,7 +109,6 @@ public class PersonController {
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
-		
 		return new ResponseEntity<SuccessMsg>(success, header, HttpStatus.valueOf(200));
 	}
 	
@@ -121,7 +118,7 @@ public class PersonController {
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> personSearch (@Parameter(name = "회원명", required = true) @PathVariable String personName,
+	public ResponseEntity<?> personSearch (@ApiParam(value = "회원명", required = true) @PathVariable String personName,
 			HttpServletRequest request) throws Exception {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
@@ -133,7 +130,7 @@ public class PersonController {
 			long personId = authSvc.getPersonId(token);
 			
 			if (person.getPersonId() != personId) {
-				return ExceptionUtils.setException(errors, 401, "유효하지 않은 접근입니다.", header);
+				return ExceptionUtils.setException(errors, 401, "본인 정보만 검색할 수 있습니다.", header);
 			}
 			return new ResponseEntity<Person>(person, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
@@ -147,7 +144,7 @@ public class PersonController {
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> partyAddressAdd (@Parameter(name = "주소 정보", required = true) @RequestBody Address address,
+	public ResponseEntity<?> partyAddressAdd (@ApiParam(value = "주소 정보", required = true) @RequestBody Address address,
 			HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
@@ -173,7 +170,7 @@ public class PersonController {
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> partyAddressDelete (@Parameter(name = "주소 정보", required = true) @RequestBody Address address,
+	public ResponseEntity<?> partyAddressDelete (@ApiParam(value = "주소 정보", required = true) @RequestBody Address address,
 			HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
@@ -189,7 +186,6 @@ public class PersonController {
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
-		
 		return new ResponseEntity<Person>(person, header, HttpStatus.valueOf(200));
 	}
 
@@ -199,7 +195,7 @@ public class PersonController {
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> partyPhoneAdd (@Parameter(name = "전화번호 정보", required = true) @RequestBody Phone phone,
+	public ResponseEntity<?> partyPhoneAdd (@ApiParam(value = "전화번호 정보", required = true) @RequestBody Phone phone,
 		HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
@@ -215,7 +211,6 @@ public class PersonController {
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
-		
 		return new ResponseEntity<Person>(person, header, HttpStatus.valueOf(200));
 	}
 	
@@ -225,7 +220,7 @@ public class PersonController {
 		@ApiResponse(code = 200, message = "성공", response = Person.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> partyPhoneDelete (@Parameter(name = "전화번호 정보", required = true) @RequestBody Phone phone,
+	public ResponseEntity<?> partyPhoneDelete (@ApiParam(value = "전화번호 정보", required = true) @RequestBody Phone phone,
 		HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
@@ -241,7 +236,6 @@ public class PersonController {
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
-		
 		return new ResponseEntity<Person>(person, header, HttpStatus.valueOf(200));
 	}
 	

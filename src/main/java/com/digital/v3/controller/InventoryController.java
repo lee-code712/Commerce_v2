@@ -19,9 +19,9 @@ import com.digital.v3.service.InventoryService;
 import com.digital.v3.utils.ExceptionUtils;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -33,12 +33,12 @@ public class InventoryController {
 	InventoryService inventorySvc;
 	
 	@RequestMapping(value = "/manage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "재고 관리", notes = "특정 상품의 재고를 관리하기 위한 API. *입력 필드: inventoryId, quantity")
+	@ApiOperation(value = "재고 관리", notes = "특정 상품의 재고를 관리하기 위한 API. *입력 필드: productId, quantity")
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "성공", response = Inventory.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> inventoryManage (@Parameter(name = "재고 정보", required = true) @RequestBody Inventory inventory) {
+	public ResponseEntity<?> inventoryManage (@ApiParam(value = "재고 정보", required = true) @RequestBody Inventory inventory) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
@@ -50,7 +50,6 @@ public class InventoryController {
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
-
 		return new ResponseEntity<Inventory>(resInventory, header, HttpStatus.valueOf(200));
 	}
 	
@@ -60,7 +59,7 @@ public class InventoryController {
 		@ApiResponse(code = 200, message = "성공", response = Inventory.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> productSearch (@Parameter(name = "상품명", required = true) @PathVariable String productName) {
+	public ResponseEntity<?> inventorySearch (@ApiParam(value = "상품명", required = true) @PathVariable String productName) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
@@ -71,4 +70,5 @@ public class InventoryController {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
 	}
+
 }

@@ -40,11 +40,13 @@ public class AuthService {
 	public long getPersonId (String token) {
 		
 		Map<Long, Long> authMap = tokenMap.get(token);
-		Set<Long> set = authMap.keySet();
-		Iterator<Long> iterator = set.iterator();
-		
-		if (iterator.hasNext()) {
-			return iterator.next();
+		if (authMap != null) {
+			Set<Long> set = authMap.keySet();
+			Iterator<Long> iterator = set.iterator();
+			
+			if (iterator.hasNext()) {
+				return iterator.next();
+			}
 		}
 		return 0;
 	}
@@ -53,15 +55,17 @@ public class AuthService {
 	public synchronized static void updateValidTime (String token) {
 		
 		Map<Long, Long> authMap = tokenMap.get(token);
-		Set<Long> set = authMap.keySet();
-		Iterator<Long> iterator = set.iterator();
-		
-		if (iterator.hasNext()) {
-			long personId = iterator.next();
-			long currentTime = System.currentTimeMillis();
-			authMap.put(personId, currentTime);
+		if (authMap != null) {
+			Set<Long> set = authMap.keySet();
+			Iterator<Long> iterator = set.iterator();
 			
-			tokenMap.put(token, authMap);
+			if (iterator.hasNext()) {
+				long personId = iterator.next();
+				long currentTime = System.currentTimeMillis();
+				authMap.put(personId, currentTime);
+				
+				tokenMap.put(token, authMap);
+			}
 		}
 	}
 	
@@ -78,6 +82,10 @@ public class AuthService {
 	public static boolean isExpiredToken (String token) {
 		
 		Map<Long, Long> authMap = tokenMap.get(token);
+		if (authMap == null) {
+			return true;
+		}
+		
 		Set<Long> set = authMap.keySet();
 		Iterator<Long> iterator = set.iterator();
 		

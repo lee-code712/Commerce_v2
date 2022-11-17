@@ -22,9 +22,9 @@ import com.digital.v3.service.CartService;
 import com.digital.v3.utils.ExceptionUtils;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -43,7 +43,7 @@ public class CartController {
 		@ApiResponse(code = 200, message = "성공", response = Cart.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> cartProductAdd (@Parameter(name = "상품 정보", required = true) @RequestBody CartProduct cartProduct,
+	public ResponseEntity<?> cartProductAdd (@ApiParam(value = "상품 정보", required = true) @RequestBody CartProduct cartProduct,
 			HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
@@ -59,7 +59,6 @@ public class CartController {
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
-
 		return new ResponseEntity<Cart>(cart, header, HttpStatus.valueOf(200));
 	}
 	
@@ -69,7 +68,7 @@ public class CartController {
 		@ApiResponse(code = 200, message = "성공", response = Cart.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> cartProductDelete (@Parameter(name = "상품 정보", required = true) @RequestBody CartProduct cartProduct,
+	public ResponseEntity<?> cartProductDelete (@ApiParam(value = "상품 정보", required = true) @RequestBody CartProduct cartProduct,
 			HttpServletRequest request, HttpServletResponse response) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
@@ -85,7 +84,6 @@ public class CartController {
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
-
 		return new ResponseEntity<Cart>(cart, header, HttpStatus.valueOf(200));
 	}
 	

@@ -27,9 +27,10 @@ public class AuthInterceptor implements HandlerInterceptor {
         
         // token 값이 유효하지 않으면 401 Unauthorized 에러
         if (!AuthService.isValidToken(token)) {
+        	response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         	response.setContentType("application/json");
         	response.setCharacterEncoding("UTF-8");
-        	response.getWriter().write("{\"errorCode\":\"401\",\"errorMsg\":\"유효하지 않은 접근입니다.\"}");
+        	response.getWriter().write("{\"errorCode\":\"401\",\"errorMsg\":\"인증 토큰이 유효하지 않습니다.\"}");
         	return false;
         }
         

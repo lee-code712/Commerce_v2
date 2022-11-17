@@ -19,9 +19,9 @@ import com.digital.v3.service.CategoryService;
 import com.digital.v3.utils.ExceptionUtils;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -38,7 +38,7 @@ public class CategoryController {
 		@ApiResponse(code = 200, message = "성공", response = Category.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> categoryWrite (@Parameter(name = "카테고리 정보", required = true) @RequestBody Category category) {
+	public ResponseEntity<?> categoryWrite (@ApiParam(value = "카테고리 정보", required = true) @RequestBody Category category) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
@@ -50,7 +50,6 @@ public class CategoryController {
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
-
 		return new ResponseEntity<Category>(resCategory, header, HttpStatus.valueOf(200));
 	}
 	
@@ -60,7 +59,7 @@ public class CategoryController {
 		@ApiResponse(code = 200, message = "성공", response = Category.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> categorySearch (@Parameter(name = "카테고리명", required = true) @PathVariable String categoryName) {
+	public ResponseEntity<?> categorySearch (@ApiParam(value = "카테고리명", required = true) @PathVariable String categoryName) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		

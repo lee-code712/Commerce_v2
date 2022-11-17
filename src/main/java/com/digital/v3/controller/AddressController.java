@@ -19,9 +19,9 @@ import com.digital.v3.service.AddressService;
 import com.digital.v3.utils.ExceptionUtils;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -38,7 +38,7 @@ public class AddressController {
 		@ApiResponse(code = 200, message = "성공", response = Address.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> addressWrite (@Parameter(name = "주소 정보", required = true) @RequestBody Address address) {
+	public ResponseEntity<?> addressWrite (@ApiParam(value = "주소 정보", required = true) @RequestBody Address address) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 
@@ -50,7 +50,6 @@ public class AddressController {
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
-		
 		return new ResponseEntity<Address>(resAddress, header, HttpStatus.valueOf(200));
 	}
 	
@@ -60,7 +59,7 @@ public class AddressController {
 		@ApiResponse(code = 200, message = "성공", response = Address.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> addressSearch (@Parameter(name = "주소 상세", required = true) @PathVariable String addressDetail) {
+	public ResponseEntity<?> addressSearch (@ApiParam(value = "주소 상세", required = true) @PathVariable String addressDetail) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		

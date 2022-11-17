@@ -28,9 +28,9 @@ import com.digital.v3.service.OrderService;
 import com.digital.v3.utils.ExceptionUtils;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -49,7 +49,7 @@ public class OrderController {
 		@ApiResponse(code = 200, message = "성공", response = OrderSheet.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> orderSheetWrite (@Parameter(name = "주문 정보", required = true) @RequestBody OrderSheet orderSheet,
+	public ResponseEntity<?> orderSheetWrite (@ApiParam(value = "주문 정보", required = true) @RequestBody OrderSheet orderSheet,
 			HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
@@ -66,7 +66,6 @@ public class OrderController {
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
-
 		return new ResponseEntity<OrderSheet>(resOrderSheet, header, HttpStatus.valueOf(200));
 	}
 	
@@ -125,7 +124,7 @@ public class OrderController {
 		@ApiResponse(code = 200, message = "성공", response = Order.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> purchase (@Parameter(name = "가주문서 정보", required = true) @RequestBody Purchase purchase,
+	public ResponseEntity<?> purchase (@ApiParam(value = "가주문서 정보", required = true) @RequestBody Purchase purchase,
 			HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
@@ -139,7 +138,6 @@ public class OrderController {
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
-
 		return new ResponseEntity<Order>(order, header, HttpStatus.valueOf(200));
 	}
 
@@ -149,7 +147,7 @@ public class OrderController {
 		@ApiResponse(code = 200, message = "성공", response = OrderList.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> orderSearchByKeyword (@Parameter(name = "결제 날짜 키워드", required = true) @PathVariable String keyword, 
+	public ResponseEntity<?> orderSearchByKeyword (@ApiParam(value = "결제일 키워드", required = true) @PathVariable String keyword, 
 			HttpServletRequest request) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();

@@ -28,10 +28,10 @@
 		SELECT p.personid, p.personname, p.gender, p.password,
 			a.addressid, a.addressdetail, ph.phoneid, ph.phonenumber
 		FROM person p
-			JOIN partyaddress pa ON pa.personid = p.personid
-			JOIN address a ON a.addressid = pa.addressid
-			JOIN partyphone pph ON pph.personid = p.personid
-			JOIN phone ph ON ph.phoneid = pph.phoneid 
+			LEFT OUTER JOIN partyaddress pa ON pa.personid = p.personid
+			LEFT OUTER JOIN address a ON a.addressid = pa.addressid
+			LEFT OUTER JOIN partyphone pph ON pph.personid = p.personid
+			LEFT OUTER JOIN phone ph ON ph.phoneid = pph.phoneid 
 		WHERE p.personname = #{personName}
 	</select>
 	
@@ -39,10 +39,10 @@
 		SELECT p.personid, p.personname, p.gender, p.password,
 			a.addressid, a.addressdetail, ph.phoneid, ph.phonenumber
 		FROM person p
-			JOIN partyaddress pa ON pa.personid = p.personid
-			JOIN address a ON a.addressid = pa.addressid
-			JOIN partyphone pph ON pph.personid = p.personid
-			JOIN phone ph ON ph.phoneid = pph.phoneid 
+			LEFT OUTER JOIN partyaddress pa ON pa.personid = p.personid
+			LEFT OUTER JOIN address a ON a.addressid = pa.addressid
+			LEFT OUTER JOIN partyphone pph ON pph.personid = p.personid
+			LEFT OUTER JOIN phone ph ON ph.phoneid = pph.phoneid 
 		WHERE p.personid = #{personId}
 	</select>
 	

@@ -19,9 +19,9 @@ import com.digital.v3.service.PhoneService;
 import com.digital.v3.utils.ExceptionUtils;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -38,7 +38,7 @@ public class PhoneController {
 		@ApiResponse(code = 200, message = "성공", response = Phone.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> phoneWrite (@Parameter(name = "전화번호 정보", required = true) @RequestBody Phone phone) {
+	public ResponseEntity<?> phoneWrite (@ApiParam(value = "전화번호 정보", required = true) @RequestBody Phone phone) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
@@ -50,7 +50,6 @@ public class PhoneController {
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
-		
 		return new ResponseEntity<Phone>(resPhone, header, HttpStatus.valueOf(200));
 	}
 
@@ -60,7 +59,7 @@ public class PhoneController {
 		@ApiResponse(code = 200, message = "성공", response = Phone.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> phoneSearch (@Parameter(name = "전화번호 상세", required = true) @PathVariable String phoneNumber) {
+	public ResponseEntity<?> phoneSearch (@ApiParam(value = "전화번호 상세", required = true) @PathVariable String phoneNumber) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		

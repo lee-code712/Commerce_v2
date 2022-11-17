@@ -20,9 +20,9 @@ import com.digital.v3.service.ProductService;
 import com.digital.v3.utils.ExceptionUtils;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -39,7 +39,7 @@ public class ProductController {
 		@ApiResponse(code = 200, message = "성공", response = Product.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> productWrite (@Parameter(name = "상품 정보", required = true) @RequestBody Product product) {
+	public ResponseEntity<?> productWrite (@ApiParam(value = "상품 정보", required = true) @RequestBody Product product) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
@@ -51,7 +51,6 @@ public class ProductController {
 		} catch (Exception e) {
 			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
 		}
-
 		return new ResponseEntity<Product>(resProduct, header, HttpStatus.valueOf(200));
 	}
 
@@ -61,7 +60,7 @@ public class ProductController {
 		@ApiResponse(code = 200, message = "성공", response = ProductList.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> productSearchBykeyword (@Parameter(name = "상품명 키워드", required = true) @PathVariable String keyword) {
+	public ResponseEntity<?> productSearchBykeyword (@ApiParam(value = "상품명 키워드", required = true) @PathVariable String keyword) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
@@ -79,7 +78,7 @@ public class ProductController {
 		@ApiResponse(code = 200, message = "성공", response = ProductList.class),
 		@ApiResponse(code = 500, message = "실패", response = ErrorMsg.class)
 	})
-	public ResponseEntity<?> productSearchByCategory (@Parameter(name = "카테고리명", required = true) @PathVariable String categoryName) {
+	public ResponseEntity<?> productSearchByCategory (@ApiParam(value = "카테고리명", required = true) @PathVariable String categoryName) {
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		ErrorMsg errors = new ErrorMsg();
 		
