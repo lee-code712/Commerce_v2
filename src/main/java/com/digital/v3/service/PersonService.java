@@ -4,10 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.digital.v3.dao.PersonDao;
 import com.digital.v3.schema.Address;
 import com.digital.v3.schema.Person;
 import com.digital.v3.schema.Phone;
-import com.digital.v3.sql.mapper.PersonMapper;
 import com.digital.v3.sql.vo.AddressVO;
 import com.digital.v3.sql.vo.PartyAddressVO;
 import com.digital.v3.sql.vo.PartyPhoneVO;
@@ -27,14 +27,14 @@ public class PersonService {
 	@Resource
 	PhoneService phoneSvc;
 	@Autowired
-	PersonMapper personMapper;
+	PersonDao personDao;
 
 	/* 회원 등록 */
 	@Transactional
 	public boolean signUp (Person person) throws Exception {
 		try {
 			// person 중복 여부 확인
-			if (personMapper.getPersonByName(person.getPersonName()) != null) {
+			if (personDao.getPersonByName(person.getPersonName()) != null) {
 				throw new Exception("이미 가입한 회원입니다.");
 			}
 
@@ -42,7 +42,7 @@ public class PersonService {
 			person.setPersonId(System.currentTimeMillis());
 			PersonVO personVo = setPersonVO(person);
 
-			personMapper.createPerson(personVo);
+			personDao.createPerson(personVo);
 			
 			// address & party address write
 			List<Address> addressList = person.getAddressList();
@@ -91,7 +91,7 @@ public class PersonService {
 	/* 회원 검색 - personName */
 	public Person personSearch (String personName) throws Exception {
 		
-		PersonVO personVo = personMapper.getPersonByName(personName);
+		PersonVO personVo = personDao.getPersonByName(personName);
 		
 		Person person = new Person();
 		if (personVo != null) {
@@ -104,7 +104,7 @@ public class PersonService {
 	/* 회원 검색 - personId */
 	public Person personSearchById (long personId) throws Exception {
 		
-		PersonVO personVo = personMapper.getPersonById(personId);
+		PersonVO personVo = personDao.getPersonById(personId);
 		
 		Person person = new Person();
 		if (personVo != null) {
@@ -120,12 +120,12 @@ public class PersonService {
 			PartyAddressVO partyAddressVo = setPartyAddressVo(personId, addressId);
 			
 			// party address 중복 여부 확인
-			if (personMapper.isExistPartyAddress(partyAddressVo) > 0) {
+			if (personDao.isExistPartyAddress(partyAddressVo) > 0) {
 				throw new Exception("회원 정보에 이미 등록된 주소입니다."); 
 			}
 
 			// 중복이 아니면 write
-			personMapper.createPartyAddress(partyAddressVo);
+			personDao.createPartyAddress(partyAddressVo);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -138,12 +138,12 @@ public class PersonService {
 			PartyAddressVO partyAddressVo = setPartyAddressVo(personId, addressId);
 			
 			// party address 존재 여부 확인
-			if (personMapper.isExistPartyAddress(partyAddressVo) == 0) {
+			if (personDao.isExistPartyAddress(partyAddressVo) == 0) {
 				throw new Exception("회원 정보에 해당 주소가 없습니다."); 
 			} 
 	
 			// 존재하면 delete
-			personMapper.deletePartyAddress(partyAddressVo);
+			personDao.deletePartyAddress(partyAddressVo);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -156,12 +156,12 @@ public class PersonService {
 			PartyPhoneVO partyPhoneVo = setPartyPhoneVo(personId, phoneId);
 			
 			// party phone 중복 여부 확인
-			if (personMapper.isExistPartyPhone(partyPhoneVo) > 0) {
+			if (personDao.isExistPartyPhone(partyPhoneVo) > 0) {
 				throw new Exception("회원정보에 이미 등록된 전화번호입니다."); 
 			} 
 	
 			// 중복이 아니면 write
-			personMapper.createPartyPhone(partyPhoneVo);
+			personDao.createPartyPhone(partyPhoneVo);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -174,12 +174,12 @@ public class PersonService {
 			PartyPhoneVO partyPhoneVo = setPartyPhoneVo(personId, phoneId);
 			
 			// party phone 존재 여부 확인
-			if (personMapper.isExistPartyPhone(partyPhoneVo) == 0) {
+			if (personDao.isExistPartyPhone(partyPhoneVo) == 0) {
 				throw new Exception("회원정보에 해당 전화번호가 없습니다."); 
 			} 
 	
 			// 존재하면 delete
-			personMapper.deletePartyPhone(partyPhoneVo);
+			personDao.deletePartyPhone(partyPhoneVo);
 			return true;
 		} catch (Exception e) {
 			throw e;

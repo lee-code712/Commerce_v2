@@ -3,21 +3,21 @@ package com.digital.v3.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.digital.v3.dao.CategoryDao;
 import com.digital.v3.schema.Category;
-import com.digital.v3.sql.mapper.CategoryMapper;
 import com.digital.v3.sql.vo.CategoryVO;
 
 @Component
 public class CategoryService {
 	
 	@Autowired
-	CategoryMapper categoryMapper;
+	CategoryDao categoryDao;
 	
 	/* 카테고리 등록 */
 	public boolean categoryWrite (Category category) throws Exception {
 		try {
 			// category 중복 여부 확인
-			if (categoryMapper.getCategoryByName(category.getCategoryName()) != null) {
+			if (categoryDao.getCategoryByName(category.getCategoryName()) != null) {
 				throw new Exception("이미 등록된 카테고리입니다."); 
 			}
 			
@@ -25,7 +25,7 @@ public class CategoryService {
 			category.setCategoryId(System.currentTimeMillis());
 			CategoryVO categoryVo = setCategoryVO(category);
 
-			categoryMapper.createCategory(categoryVo);
+			categoryDao.createCategory(categoryVo);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -35,7 +35,7 @@ public class CategoryService {
 	/* 카테고리 검색 - categoryName */
 	public Category categorySearch (String categoryName) throws Exception {
 		
-		CategoryVO categoryVo = categoryMapper.getCategoryByName(categoryName);
+		CategoryVO categoryVo = categoryDao.getCategoryByName(categoryName);
 		
 		Category category = new Category();
 		if (categoryVo != null) {

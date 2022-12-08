@@ -11,13 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.digital.v3.dao.OrderDao;
 import com.digital.v3.schema.CartProduct;
 import com.digital.v3.schema.Inventory;
 import com.digital.v3.schema.Order;
 import com.digital.v3.schema.OrderList;
 import com.digital.v3.schema.OrderSheet;
 import com.digital.v3.schema.Purchase;
-import com.digital.v3.sql.mapper.OrderMapper;
 import com.digital.v3.sql.vo.AddressVO;
 import com.digital.v3.sql.vo.OrderSheetVO;
 import com.digital.v3.sql.vo.PartyProductVO;
@@ -29,14 +29,14 @@ public class OrderService {
 	@Resource 
 	InventoryService inventorySvc;
 	@Autowired
-	OrderMapper orderMapper;
+	OrderDao orderDao;
 	
 	/* 주문서 등록 */
 	@Transactional
 	public boolean orderSheetWrite (OrderSheet orderSheet) throws Exception {
 		try {
 			// 주문서 중복 여부 확인
-			if (orderMapper.getOrderSheetByPerson(orderSheet.getPersonId()) != null) {
+			if (orderDao.getOrderSheetByPerson(orderSheet.getPersonId()) != null) {
 				throw new Exception("이미 등록된 가주문서가 존재합니다.");
 			}
 			
@@ -70,13 +70,13 @@ public class OrderService {
 			orderSheet.setOrderSheetId(System.currentTimeMillis());
 			OrderSheetVO orderSheetVO = setOrderSheetVO(orderSheet);
 			
-			orderMapper.createOrderSheet(orderSheetVO);
+			orderDao.createOrderSheet(orderSheetVO);
 			
 			// order product orderId update
 			for (CartProduct product : orderSheet.getProducts()) {
 				PartyProductVO orderProductVo = 
 						setOrderProductVO(orderSheetVO.getPersonId(), orderSheetVO.getOrderId(), product);
-				orderMapper.updateOrderIdOfOrderProduct(orderProductVo);
+				orderDao.updateOrderIdOfOrderProduct(orderProductVo);
 			}
 			return true;
 		} catch (Exception e) {
@@ -88,12 +88,12 @@ public class OrderService {
 	public boolean orderSheetDelete (long personId) throws Exception {
 		try {
 			// order sheet 존재 여부 확인
-			if (orderMapper.getOrderSheetByPerson(personId) == null) {
+			if (orderDao.getOrderSheetByPerson(personId) == null) {
 				throw new Exception("현재 등록된 가주문서가 없습니다.");
 			}
 			
 			// 존재하면 delete
-			orderMapper.deleteOrderSheet(personId);
+			orderDao.deleteOrderSheet(personId);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -107,12 +107,12 @@ public class OrderService {
 			OrderSheet orderSheet = orderSheetSearchById(purchase.getOrderSheetId());
 			
 			// 주문서 존재 여부 확인
-			if (orderMapper.getOrderSheetById(purchase.getOrderSheetId()) == null) {
+			if (orderDao.getOrderSheetById(purchase.getOrderSheetId()) == null) {
 				throw new Exception("가주문서를 찾을 수 없습니다.");
 			}
 			
 			// 존재하면 구매 정보 write
-			orderMapper.createPurchase(purchase.getOrderSheetId());
+			orderDao.createPurchase(purchase.getOrderSheetId());
 			
 			// order product들의 재고 수량 update
 			List<CartProduct> products = orderSheet.getProducts();
@@ -130,7 +130,7 @@ public class OrderService {
 	/* 주문서 검색 - personId */
 	public OrderSheet orderSheetSearch (long personId) {
 		
-		OrderSheetVO orderSheetVo = orderMapper.getOrderSheetByPerson(personId);
+		OrderSheetVO orderSheetVo = orderDao.getOrderSheetByPerson(personId);
 		
 		OrderSheet orderSheet = new OrderSheet();
 		if (orderSheetVo != null) {
@@ -143,7 +143,7 @@ public class OrderService {
 	/* 주문서 검색 - orderSheetId */
 	public OrderSheet orderSheetSearchById (long orderSheetId) {
 		
-		OrderSheetVO orderSheetVo = orderMapper.getOrderSheetById(orderSheetId);
+		OrderSheetVO orderSheetVo = orderDao.getOrderSheetById(orderSheetId);
 		
 		OrderSheet orderSheet = new OrderSheet();
 		if (orderSheetVo != null) {
@@ -156,7 +156,7 @@ public class OrderService {
 	/* 주문 검색 - orderSheetId */
 	public Order orderSearchById (long orderSheetId) throws Exception {
 
-		OrderSheetVO orderVo = orderMapper.getOrderById(orderSheetId);
+		OrderSheetVO orderVo = orderDao.getOrderById(orderSheetId);
 		
 		Order order = new Order();
 		if (orderVo != null) {
@@ -173,7 +173,7 @@ public class OrderService {
 	/* 주문 검색 - purchaseDate */
 	public OrderList orderSearchByDate (long personId, String purchaseDate) throws Exception {
 
-		List<OrderSheetVO> orderVoList = orderMapper.getOrderByDate(personId, purchaseDate);
+		List<OrderSheetVO> orderVoList = orderDao.getOrderByDate(personId, purchaseDate);
 		
 		OrderList orders = new OrderList();
 		List<Order> orderList = new ArrayList<Order>();

@@ -8,9 +8,9 @@ import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.digital.v3.dao.CartDao;
 import com.digital.v3.schema.Cart;
 import com.digital.v3.schema.CartProduct;
-import com.digital.v3.sql.mapper.CartMapper;
 import com.digital.v3.sql.vo.PartyProductVO;
 
 @Component
@@ -19,7 +19,7 @@ public class CartService {
 	@Resource
 	InventoryService inventorySvc;
 	@Autowired
-	CartMapper cartMapper;
+	CartDao cartDao;
 
 	/* 장바구니에 상품 등록 */
 	public boolean cartProductWrite (long personId, CartProduct cartProduct) throws Exception {
@@ -27,14 +27,14 @@ public class CartService {
 			PartyProductVO cartProductVo = setCartProductVO(personId, cartProduct);
 
 			// 입력 수량 유효성 확인 - 중복 상품의 담은 수량을 입력 수량에 더한 값으로 계산
-			int cartQuantity = cartMapper.getQuantityOfPluralCartProduct(cartProductVo);
+			int cartQuantity = cartDao.getQuantityOfPluralCartProduct(cartProductVo);
 			cartQuantity += cartProductVo.getQuantity();
 			if (!inventorySvc.inventoryQuantityCheck(cartProduct.getProductId(), cartQuantity)) {
 				throw new Exception("상품 ID: " + cartProduct.getProductId() + "의 입력 수량이 재고 수량을 초과합니다.");
 			}
 	
 			// 유효한 입력 수량이면 write
-			cartMapper.createCartProduct(cartProductVo);
+			cartDao.createCartProduct(cartProductVo);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -44,7 +44,7 @@ public class CartService {
 	/* 장바구니 검색 - personId */
 	public Cart cartSearch (long personId) throws Exception {
 
-		List<PartyProductVO> cartProductVOList = cartMapper.getCartProductByPerson(personId);
+		List<PartyProductVO> cartProductVOList = cartDao.getCartProductByPerson(personId);
 
 		Cart cart = new Cart();
 		List<CartProduct> cartProductList = new ArrayList<CartProduct>();
@@ -63,12 +63,12 @@ public class CartService {
 			PartyProductVO partyProductVo = setCartProductVO(personId, cartProduct);
 			
 			// cartProduct 존재 여부 확인
-			if (cartMapper.isExistCartProduct(partyProductVo) == 0) {
+			if (cartDao.isExistCartProduct(partyProductVo) == 0) {
 				throw new Exception("장바구니에 해당하는 상품이 없습니다."); 
 			}
 			
 			// 존재하면 delete
-			cartMapper.deleteCartProduct(partyProductVo);
+			cartDao.deleteCartProduct(partyProductVo);
 			return true;
 		} catch (Exception e) {
 			throw e;

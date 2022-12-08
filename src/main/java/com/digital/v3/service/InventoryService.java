@@ -3,21 +3,21 @@ package com.digital.v3.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.digital.v3.dao.InventoryDao;
 import com.digital.v3.schema.Inventory;
-import com.digital.v3.sql.mapper.InventoryMapper;
 import com.digital.v3.sql.vo.InventoryVO;
 
 @Component
 public class InventoryService {
 
 	@Autowired
-	InventoryMapper inventoryMapper;
+	InventoryDao inventoryDao;
 
 	/* 재고 등록 */
 	public boolean inventoryWrite (Inventory inventory) throws Exception {
 		try {
 			// inventory 중복 여부 확인
-			if (inventoryMapper.getInventoryById(inventory.getProductId()) != null) {
+			if (inventoryDao.getInventoryById(inventory.getProductId()) != null) {
 				// 중복이면 update
 				inventoryUpdate(inventory);
 				return true;
@@ -26,7 +26,7 @@ public class InventoryService {
 			// 중복이 아니면 write
 			InventoryVO inventoryVo = setInventoryVO(inventory);
 
-			inventoryMapper.createInventory(inventoryVo);
+			inventoryDao.createInventory(inventoryVo);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -36,7 +36,7 @@ public class InventoryService {
 	/* 재고 검색 - productName */
 	public Inventory inventorySearch (String productName) throws Exception {
 		
-		InventoryVO inventoryVo = inventoryMapper.getInventoryByName(productName);
+		InventoryVO inventoryVo = inventoryDao.getInventoryByName(productName);
 		
 		Inventory inventory = new Inventory();
 		if (inventoryVo != null) {
@@ -49,7 +49,7 @@ public class InventoryService {
 	/* 재고 검색 - productId */
 	public Inventory inventorySearchById (long productId) throws Exception {
 		
-		InventoryVO inventoryVo = inventoryMapper.getInventoryById(productId);
+		InventoryVO inventoryVo = inventoryDao.getInventoryById(productId);
 		
 		Inventory inventory = new Inventory();
 		if (inventoryVo != null) {
@@ -64,7 +64,7 @@ public class InventoryService {
 		try {
 			InventoryVO inventoryVo = setInventoryVO(inventory);
 			
-			inventoryMapper.updateInventoryQuantity(inventoryVo);
+			inventoryDao.updateInventoryQuantity(inventoryVo);
 			return true;
 		} catch (Exception e) {
 			throw e;

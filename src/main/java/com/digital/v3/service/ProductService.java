@@ -6,9 +6,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.digital.v3.dao.ProductDao;
 import com.digital.v3.schema.Product;
 import com.digital.v3.schema.ProductList;
-import com.digital.v3.sql.mapper.ProductMapper;
 import com.digital.v3.sql.vo.CategoryVO;
 import com.digital.v3.sql.vo.ProductVO;
 
@@ -16,13 +16,13 @@ import com.digital.v3.sql.vo.ProductVO;
 public class ProductService {
 	
 	@Autowired
-	ProductMapper productMapper;
+	ProductDao productDao;
 	
 	/* 상품 등록 */
 	public boolean productWrite (Product product) throws Exception {
 		try {
 			// product 중복 여부 확인
-			if (productMapper.getProductByName(product.getProductName()) != null) {
+			if (productDao.getProductByName(product.getProductName()) != null) {
 				throw new Exception("이미 등록된 상품입니다.");
 			}
 			
@@ -30,7 +30,7 @@ public class ProductService {
 			product.setProductId(System.currentTimeMillis());
 			ProductVO productVo = setProductVO(product);
 			
-			productMapper.createProduct(productVo);
+			productDao.createProduct(productVo);
 			return true;
 		} catch (Exception e) {
 			throw e;
@@ -40,7 +40,7 @@ public class ProductService {
 	/* 상품 검색 - productName */
 	public Product productSearch (String productName) throws Exception {
 
-		ProductVO productVo = productMapper.getProductByName(productName);
+		ProductVO productVo = productDao.getProductByName(productName);
 		
 		Product product = new Product();
 		if (productVo != null) {
@@ -53,7 +53,7 @@ public class ProductService {
 	/* 상품 검색 - keyword */
 	public ProductList productSearchByKeyword (String keyword) throws Exception {
 		
-		List<ProductVO> productVoList = productMapper.getProductByKeyword(keyword);
+		List<ProductVO> productVoList = productDao.getProductByKeyword(keyword);
 		
 		ProductList productList = new ProductList(); 
 		List<Product> products = new ArrayList<Product>();
@@ -69,7 +69,7 @@ public class ProductService {
 	/* 상품 검색 - categoryName */
 	public ProductList productSearchByCategory (String categoryName) throws Exception {
 		
-		List<ProductVO> productVoList = productMapper.getProductByCategory(categoryName);
+		List<ProductVO> productVoList = productDao.getProductByCategory(categoryName);
 		
 		ProductList productList = new ProductList(); 
 		List<Product> products = new ArrayList<Product>();
