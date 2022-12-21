@@ -18,7 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthInterceptor implements HandlerInterceptor {
 	
 	public static List<String> authEssential = Arrays.asList("/rest/**");
-	public static List<String> authInessential = Arrays.asList("/rest/person/signUp", "/rest/person/login", "/rest/person/logout");
+	public static List<String> authInessential = Arrays.asList("/rest/person/signUp", "/rest/person/login", "/rest/person/logout",
+			"/rest/auth/generateToken");
 	
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

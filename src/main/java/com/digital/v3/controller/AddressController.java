@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Tag(name = "주소", description = "Address Related API")
 @RequestMapping(value = "/rest/address")
-public class AddressController {
+public class AddressController extends ExceptionUtils {
 	
 	@Resource
 	private AddressService addressSvc;
@@ -48,7 +48,7 @@ public class AddressController {
 				resAddress = addressSvc.addressSearch(address.getAddressDetail());
 			}
 		} catch (Exception e) {
-			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
+			return setException(errors, 500, e.getMessage(), header);
 		}
 		return new ResponseEntity<Address>(resAddress, header, HttpStatus.valueOf(200));
 	}
@@ -67,7 +67,7 @@ public class AddressController {
 			Address address = addressSvc.addressSearch(addressDetail);
 			return new ResponseEntity<Address>(address, header, HttpStatus.valueOf(200));		
 		} catch (Exception e) {
-			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
+			return setException(errors, 500, e.getMessage(), header);
 		}
 	}
 

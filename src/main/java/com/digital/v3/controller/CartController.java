@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Tag(name = "장바구니", description = "Cart Related API")
 @RequestMapping(value = "/rest/cart")
-public class CartController {
+public class CartController extends ExceptionUtils {
 	
 	@Resource
 	CartService cartSvc;
@@ -57,7 +57,7 @@ public class CartController {
 				cart = cartSvc.cartSearch(personId);
 			}
 		} catch (Exception e) {
-			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
+			return setException(errors, 500, e.getMessage(), header);
 		}
 		return new ResponseEntity<Cart>(cart, header, HttpStatus.valueOf(200));
 	}
@@ -82,7 +82,7 @@ public class CartController {
 				cart = cartSvc.cartSearch(personId);
 			}
 		} catch (Exception e) {
-			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
+			return setException(errors, 500, e.getMessage(), header);
 		}
 		return new ResponseEntity<Cart>(cart, header, HttpStatus.valueOf(200));
 	}
@@ -104,7 +104,7 @@ public class CartController {
 			Cart cart = cartSvc.cartSearch(personId);
 			return new ResponseEntity<Cart>(cart, header, HttpStatus.valueOf(200));
 		} catch (Exception e) {
-			return ExceptionUtils.setException(errors, 500, e.getMessage(), header);
+			return setException(errors, 500, e.getMessage(), header);
 		}	
 	}
 }
